@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Mail, Phone, MapPin, ShieldAlert, FileText } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, ShieldAlert, FileText, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -10,8 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useStore } from "@/lib/store";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { EmployeeStatusPill, StatusPill, PriorityBadge } from "@/components/pills";
+import { AddRequestDialog } from "@/components/add-request-dialog";
 import { employees as employeeList } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/employees/$id")({
@@ -133,32 +134,41 @@ function EmployeePage() {
       </div>
 
       <div className="grid gap-4 lg:grid-cols-2">
-        <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-semibold">Requests</CardTitle></CardHeader>
+        <Card className="lg:col-span-2">
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-semibold">Requests</CardTitle>
+            <AddRequestDialog employeeId={emp.id} companyCode={emp.companyCode} />
+          </CardHeader>
           <CardContent className="pt-0">
             {empRequests.length === 0 ? (
-              <p className="py-4 text-sm text-muted-foreground">No requests filed.</p>
+              <p className="py-4 text-sm text-muted-foreground">
+                No requests filed. Click <span className="font-medium">Attach request</span> to log one.
+              </p>
             ) : (
-              <Table>
-                <TableHeader>
-                  <TableRow>
-                    <TableHead>Type</TableHead>
-                    <TableHead>Submitted</TableHead>
-                    <TableHead>Priority</TableHead>
-                    <TableHead>Status</TableHead>
-                  </TableRow>
-                </TableHeader>
-                <TableBody>
-                  {empRequests.map((r) => (
-                    <TableRow key={r.id}>
-                      <TableCell className="text-sm font-medium">{r.type}</TableCell>
-                      <TableCell className="text-sm text-muted-foreground">{formatDate(r.submittedAt)}</TableCell>
-                      <TableCell><PriorityBadge priority={r.priority} /></TableCell>
-                      <TableCell><StatusPill status={r.status} /></TableCell>
-                    </TableRow>
-                  ))}
-                </TableBody>
-              </Table>
+              <div className="divide-y">
+                {empRequests.map((r) => (
+                  <div key={r.id} className="py-3">
+                    <div className="flex flex-wrap items-center gap-2">
+                      <span className="text-sm font-medium">{r.type}</span>
+                      <PriorityBadge priority={r.priority} />
+                      <StatusPill status={r.status} />
+                      <span className="ml-auto text-xs text-muted-foreground">
+                        Submitted {formatDate(r.submittedAt)}
+                        {r.assignedTo && ` · ${r.assignedTo}`}
+                      </span>
+                    </div>
+                    {r.notes && (
+                      <p className="mt-1.5 text-sm text-foreground/90">{r.notes}</p>
+                    )}
+                    {r.completedAt && (
+                      <div className="mt-1.5 inline-flex items-center gap-1 text-xs text-success">
+                        <CheckCircle2 className="h-3 w-3" />
+                        Completed {formatDateTime(r.completedAt)}
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
             )}
           </CardContent>
         </Card>

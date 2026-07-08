@@ -9,6 +9,7 @@ import {
   type Employee,
   type Task,
   type EmployeeRequest,
+  type RequestStatus,
   type PayrollIssue,
 } from "./mock-data";
 
@@ -56,8 +57,32 @@ export const store = {
   updateRequest(id: string, patch: Partial<EmployeeRequest>) {
     state = {
       ...state,
-      requests: state.requests.map((r) => (r.id === id ? { ...r, ...patch } : r)),
+      requests: state.requests.map((r) =>
+        r.id === id
+          ? {
+              ...r,
+              ...patch,
+              completedAt:
+                patch.status === "Resolved"
+                  ? (r.completedAt ?? new Date().toISOString())
+                  : patch.status
+                    ? undefined
+                    : r.completedAt,
+            }
+          : r,
+      ),
     };
+    emit();
+  },
+  addRequest(req: Omit<EmployeeRequest, "id" | "submittedAt" | "status"> & { status?: RequestStatus }) {
+    const id = `r_${Date.now()}`;
+    const newReq: EmployeeRequest = {
+      id,
+      submittedAt: new Date().toISOString().slice(0, 10),
+      status: req.status ?? "Open",
+      ...req,
+    };
+    state = { ...state, requests: [newReq, ...state.requests] };
     emit();
   },
   resolvePayroll(id: string) {

@@ -16,13 +16,17 @@ export function GlobalSearch() {
   const navigate = useNavigate();
   const employees = useStore((s) => s.employees);
   const companies = useStore((s) => s.companies);
+  const requests = useStore((s) => s.requests);
 
   const items = useMemo(() => {
     return {
       companies: companies.slice(0, 50),
       employees: employees.slice(0, 200),
+      requestNotes: requests.filter((r) => r.notes.trim().length > 0).slice(0, 100),
     };
-  }, [employees, companies]);
+  }, [employees, companies, requests]);
+
+  const empName = (id: string) => employees.find((e) => e.id === id)?.name ?? "Unknown";
 
   return (
     <>
@@ -65,7 +69,7 @@ export function GlobalSearch() {
             {items.employees.map((e) => (
               <CommandItem
                 key={e.id}
-                value={`${e.name} ${e.employeeNumber} ${e.phone} ${e.companyCode}`}
+                value={`${e.name} ${e.employeeNumber} ${e.phone} ${e.companyCode} ${e.position} ${e.notes}`}
                 onSelect={() => {
                   setOpen(false);
                   navigate({ to: "/employees/$id", params: { id: e.id } });
@@ -81,10 +85,32 @@ export function GlobalSearch() {
               </CommandItem>
             ))}
           </CommandGroup>
+          <CommandGroup heading="Request notes">
+            {items.requestNotes.map((r) => (
+              <CommandItem
+                key={r.id}
+                value={`${empName(r.employeeId)} ${r.type} ${r.notes}`}
+                onSelect={() => {
+                  setOpen(false);
+                  navigate({ to: "/employees/$id", params: { id: r.employeeId } });
+                }}
+              >
+                <FileText className="text-muted-foreground" />
+                <div className="flex-1 min-w-0">
+                  <div className="truncate text-sm font-medium">
+                    {empName(r.employeeId)} — {r.type}
+                  </div>
+                  <div className="truncate text-xs text-muted-foreground">
+                    {r.notes}
+                  </div>
+                </div>
+              </CommandItem>
+            ))}
+          </CommandGroup>
         </CommandList>
       </CommandDialog>
     </>
   );
 }
 
-import { Building, User as UserIcon } from "lucide-react";
+import { Building, User as UserIcon, FileText } from "lucide-react";
