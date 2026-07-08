@@ -16,13 +16,17 @@ export function GlobalSearch() {
   const navigate = useNavigate();
   const employees = useStore((s) => s.employees);
   const companies = useStore((s) => s.companies);
+  const requests = useStore((s) => s.requests);
 
   const items = useMemo(() => {
     return {
       companies: companies.slice(0, 50),
       employees: employees.slice(0, 200),
+      requestNotes: requests.filter((r) => r.notes.trim().length > 0).slice(0, 100),
     };
-  }, [employees, companies]);
+  }, [employees, companies, requests]);
+
+  const empName = (id: string) => employees.find((e) => e.id === id)?.name ?? "Unknown";
 
   return (
     <>
