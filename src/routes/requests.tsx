@@ -46,7 +46,8 @@ function RequestsPage() {
           if (
             !empName(r.employeeId).toLowerCase().includes(s) &&
             !r.type.toLowerCase().includes(s) &&
-            !r.companyCode.toLowerCase().includes(s)
+            !r.companyCode.toLowerCase().includes(s) &&
+            !r.notes.toLowerCase().includes(s)
           )
             return false;
         }
