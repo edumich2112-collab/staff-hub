@@ -1,5 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { ArrowLeft, Mail, Phone, MapPin, ShieldAlert, FileText } from "lucide-react";
+import { ArrowLeft, Mail, Phone, MapPin, ShieldAlert, FileText, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -10,8 +10,9 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useStore } from "@/lib/store";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { EmployeeStatusPill, StatusPill, PriorityBadge } from "@/components/pills";
+import { AddRequestDialog } from "@/components/add-request-dialog";
 import { employees as employeeList } from "@/lib/mock-data";
 
 export const Route = createFileRoute("/employees/$id")({
