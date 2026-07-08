@@ -68,10 +68,10 @@ function EmployeesPage() {
       <Card>
         <CardContent className="flex flex-wrap items-center gap-2 p-3">
           <Input
-            placeholder="Search name, phone, number…"
+            placeholder="Search name, phone, number, or request notes…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="w-72"
+            className="w-96"
           />
           <Select value={company} onValueChange={setCompany}>
             <SelectTrigger className="w-48"><SelectValue placeholder="Company" /></SelectTrigger>
