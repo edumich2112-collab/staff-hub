@@ -33,6 +33,7 @@ function EmployeesPage() {
   const [status, setStatus] = useState("all");
   const [company, setCompany] = useState("all");
 
+  const requests = useStore((s) => s.requests);
   const filtered = useMemo(() => {
     const s = q.toLowerCase();
     return employees
@@ -40,15 +41,20 @@ function EmployeesPage() {
         if (status !== "all" && e.status !== status) return false;
         if (company !== "all" && e.companyCode !== company) return false;
         if (!q) return true;
+        const reqMatch = requests.some(
+          (r) => r.employeeId === e.id && r.notes.toLowerCase().includes(s),
+        );
         return (
           e.name.toLowerCase().includes(s) ||
           e.employeeNumber.toLowerCase().includes(s) ||
           e.phone.includes(s) ||
-          e.position.toLowerCase().includes(s)
+          e.position.toLowerCase().includes(s) ||
+          e.notes.toLowerCase().includes(s) ||
+          reqMatch
         );
       })
       .sort((a, b) => a.name.localeCompare(b.name));
-  }, [employees, q, status, company]);
+  }, [employees, requests, q, status, company]);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-4">
