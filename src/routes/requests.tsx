@@ -18,7 +18,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useStore, store } from "@/lib/store";
-import { formatDate } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { PriorityBadge, RequestStatusPill } from "@/components/pills";
 import type { RequestStatus } from "@/lib/mock-data";
 
