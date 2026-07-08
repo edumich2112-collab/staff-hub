@@ -44,7 +44,7 @@ export const store = {
               completedAt:
                 patch.status === "Completed"
                   ? new Date().toISOString().slice(0, 10)
-                  : patch.status && patch.status !== "Completed"
+                  : patch.status
                     ? undefined
                     : t.completedAt,
             }
