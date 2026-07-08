@@ -148,6 +148,7 @@ function RootComponent() {
               <div className="flex-1">
                 <GlobalSearch />
               </div>
+              <ThemeToggle />
             </header>
             <main className="flex-1 p-6">
               <Outlet />
