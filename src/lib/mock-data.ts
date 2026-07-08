@@ -57,6 +57,7 @@ export interface EmployeeRequest {
   status: RequestStatus;
   assignedTo: string;
   notes: string;
+  completedAt?: string;
 }
 
 export interface PayrollIssue {
