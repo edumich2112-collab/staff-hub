@@ -128,7 +128,14 @@ function RequestsPage() {
                   </Link>
                 </TableCell>
                 <TableCell className="text-sm">{r.type}</TableCell>
-                <TableCell className="text-sm text-muted-foreground">{formatDate(r.submittedAt)}</TableCell>
+                <TableCell className="text-sm text-muted-foreground">
+                  {formatDate(r.submittedAt)}
+                  {r.completedAt && (
+                    <div className="text-[11px] text-success">
+                      ✓ {formatDateTime(r.completedAt)}
+                    </div>
+                  )}
+                </TableCell>
                 <TableCell><PriorityBadge priority={r.priority} /></TableCell>
                 <TableCell className="text-sm">{r.assignedTo}</TableCell>
                 <TableCell>
