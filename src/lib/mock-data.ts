@@ -33,6 +33,7 @@ export interface Employee {
   currentAssignment: string;
   directDeposit: "Active" | "Pending" | "None";
   notes: string;
+  scheduledStartDate?: string;
 }
 
 export interface Task {
