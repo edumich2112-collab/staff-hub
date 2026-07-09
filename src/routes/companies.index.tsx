@@ -5,7 +5,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
 
-export const Route = createFileRoute("/companies")({
+export const Route = createFileRoute("/companies/")({
   head: () => ({ meta: [{ title: "Companies — Staffhub" }] }),
   component: CompaniesPage,
 });
