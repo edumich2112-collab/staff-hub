@@ -4,6 +4,13 @@ import { Building2, ArrowLeft } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
   Tabs,
   TabsContent,
   TabsList,
@@ -17,10 +24,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useStore } from "@/lib/store";
+import { store, useStore } from "@/lib/store";
 import { formatDate } from "@/lib/format";
-import { EmployeeStatusPill, StatusPill } from "@/components/pills";
-import { companies as companyList } from "@/lib/mock-data";
+import { StatusPill } from "@/components/pills";
+import { companies as companyList, type Employee, type EmployeeStatus } from "@/lib/mock-data";
+
+const STATUSES: EmployeeStatus[] = ["Active", "Pending Start", "On Assignment", "Former"];
 
 export const Route = createFileRoute("/companies/$code")({
   loader: ({ params }) => {
@@ -28,9 +37,7 @@ export const Route = createFileRoute("/companies/$code")({
     if (!c) throw notFound();
     return { code: params.code };
   },
-  head: ({ params }) => ({
-    meta: [{ title: `${params.code} — Staffhub` }],
-  }),
+  head: ({ params }) => ({ meta: [{ title: `${params.code} — Staffhub` }] }),
   component: CompanyPage,
   notFoundComponent: () => (
     <div className="p-10 text-center text-muted-foreground">Company not found.</div>
@@ -39,28 +46,44 @@ export const Route = createFileRoute("/companies/$code")({
 
 function CompanyPage() {
   const { code } = Route.useParams();
-  const company = useStore((s) => s.companies.find((c) => c.code === code)!);
-  const employees = useStore((s) => s.employees.filter((e) => e.companyCode === code));
-  const requests = useStore((s) => s.requests.filter((r) => r.companyCode === code));
-  const payroll = useStore((s) => s.payrollIssues.filter((p) => p.companyCode === code));
+  const allCompanies = useStore((s) => s.companies);
+  const allEmployees = useStore((s) => s.employees);
+  const allRequests = useStore((s) => s.requests);
+  const allPayroll = useStore((s) => s.payrollIssues);
   const [q, setQ] = useState("");
+
+  const company = allCompanies.find((c) => c.code === code)!;
+  const employees = useMemo(
+    () => allEmployees.filter((e) => e.companyCode === code),
+    [allEmployees, code],
+  );
+  const requests = useMemo(
+    () => allRequests.filter((r) => r.companyCode === code),
+    [allRequests, code],
+  );
+  const payroll = useMemo(
+    () => allPayroll.filter((p) => p.companyCode === code),
+    [allPayroll, code],
+  );
 
   const active = employees.filter((e) => e.status === "Active");
   const pending = employees.filter((e) => e.status === "Pending Start");
   const former = employees.filter((e) => e.status === "Former");
   const filtered = useMemo(() => {
+    if (!q) return employees;
     const s = q.toLowerCase();
     return employees.filter(
       (e) =>
-        !q ||
         e.name.toLowerCase().includes(s) ||
         e.employeeNumber.toLowerCase().includes(s) ||
         e.phone.includes(s) ||
-        e.position.toLowerCase().includes(s),
+        e.position.toLowerCase().includes(s) ||
+        e.notes.toLowerCase().includes(s),
     );
   }, [employees, q]);
 
   const empName = (id: string) => employees.find((e) => e.id === id)?.name ?? "—";
+  const filteredIds = useMemo(() => new Set(filtered.map((e) => e.id)), [filtered]);
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-5">
@@ -100,7 +123,7 @@ function CompanyPage() {
           </CardHeader>
           <CardContent>
             <Input
-              placeholder="Search by name, number, phone, position…"
+              placeholder="Search by name, number, phone, position, notes…"
               value={q}
               onChange={(e) => setQ(e.target.value)}
               className="mb-3 max-w-md"
@@ -113,9 +136,9 @@ function CompanyPage() {
                 <TabsTrigger value="all">All results ({filtered.length})</TabsTrigger>
               </TabsList>
               {[
-                { key: "active", data: active.filter((e) => filtered.includes(e)) },
-                { key: "pending", data: pending.filter((e) => filtered.includes(e)) },
-                { key: "former", data: former.filter((e) => filtered.includes(e)) },
+                { key: "active", data: active.filter((e) => filteredIds.has(e.id)) },
+                { key: "pending", data: pending.filter((e) => filteredIds.has(e.id)) },
+                { key: "former", data: former.filter((e) => filteredIds.has(e.id)) },
                 { key: "all", data: filtered },
               ].map((tab) => (
                 <TabsContent key={tab.key} value={tab.key} className="mt-3">
@@ -197,22 +220,21 @@ function Stat({ label, value }: { label: string; value: number }) {
   );
 }
 
-function EmployeeTable({ rows }: { rows: ReturnType<typeof useStore<any>> }) {
+function EmployeeTable({ rows }: { rows: Employee[] }) {
   return (
     <Table>
       <TableHeader>
         <TableRow>
           <TableHead>Name</TableHead>
           <TableHead>Phone</TableHead>
-          <TableHead>Status</TableHead>
           <TableHead>Position</TableHead>
           <TableHead>Pay Rate</TableHead>
-          <TableHead>Hire Date</TableHead>
-          <TableHead>Emp #</TableHead>
+          <TableHead>Start Date</TableHead>
+          <TableHead className="w-[210px]">Status</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
-        {rows.map((e: any) => (
+        {rows.map((e) => (
           <TableRow key={e.id}>
             <TableCell>
               <Link
@@ -222,23 +244,69 @@ function EmployeeTable({ rows }: { rows: ReturnType<typeof useStore<any>> }) {
               >
                 {e.name}
               </Link>
+              <div className="text-[11px] text-muted-foreground">{e.employeeNumber}</div>
             </TableCell>
-            <TableCell className="text-sm text-muted-foreground">{e.phone}</TableCell>
-            <TableCell><EmployeeStatusPill status={e.status} /></TableCell>
+            <TableCell className="text-sm text-muted-foreground">{e.phone || "—"}</TableCell>
             <TableCell className="text-sm">{e.position}</TableCell>
             <TableCell className="text-sm">${e.payRate.toFixed(2)}/hr</TableCell>
-            <TableCell className="text-sm">{formatDate(e.hireDate)}</TableCell>
-            <TableCell className="text-sm text-muted-foreground">{e.employeeNumber}</TableCell>
+            <TableCell className="text-sm">
+              {e.status === "Pending Start" && e.scheduledStartDate
+                ? `Starts ${formatDate(e.scheduledStartDate)}`
+                : e.hireDate
+                  ? formatDate(e.hireDate)
+                  : "—"}
+            </TableCell>
+            <TableCell>
+              <StatusEditor employee={e} />
+            </TableCell>
           </TableRow>
         ))}
         {rows.length === 0 && (
           <TableRow>
-            <TableCell colSpan={7} className="py-8 text-center text-sm text-muted-foreground">
+            <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
               No employees.
             </TableCell>
           </TableRow>
         )}
       </TableBody>
     </Table>
+  );
+}
+
+function StatusEditor({ employee }: { employee: Employee }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      <Select
+        value={employee.status}
+        onValueChange={(v) =>
+          store.updateEmployee(employee.id, {
+            status: v as EmployeeStatus,
+            scheduledStartDate:
+              v === "Pending Start" ? employee.scheduledStartDate : undefined,
+          })
+        }
+      >
+        <SelectTrigger className="h-7 w-[130px] text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {STATUSES.map((s) => (
+            <SelectItem key={s} value={s} className="text-xs">
+              {s}
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {employee.status === "Pending Start" && (
+        <input
+          type="date"
+          value={employee.scheduledStartDate ?? ""}
+          onChange={(ev) =>
+            store.updateEmployee(employee.id, { scheduledStartDate: ev.target.value })
+          }
+          className="h-7 rounded-md border bg-background px-1.5 text-xs"
+        />
+      )}
+    </div>
   );
 }
