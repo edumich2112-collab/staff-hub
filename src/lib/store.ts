@@ -85,6 +85,13 @@ export const store = {
     state = { ...state, requests: [newReq, ...state.requests] };
     emit();
   },
+  updateEmployee(id: string, patch: Partial<Employee>) {
+    state = {
+      ...state,
+      employees: state.employees.map((e) => (e.id === id ? { ...e, ...patch } : e)),
+    };
+    emit();
+  },
   resolvePayroll(id: string) {
     state = {
       ...state,
