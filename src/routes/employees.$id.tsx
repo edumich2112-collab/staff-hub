@@ -1,4 +1,5 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
+import { useMemo } from "react";
 import { ArrowLeft, Mail, Phone, MapPin, ShieldAlert, FileText, CheckCircle2 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
@@ -24,6 +25,11 @@ export const Route = createFileRoute("/employees/$id")({
     meta: [{ title: `Employee ${params.id} — Staffhub` }],
   }),
   component: EmployeePage,
+  errorComponent: ({ error }) => (
+    <div className="p-10 text-center text-muted-foreground">
+      {error?.message ?? "Something went wrong."}
+    </div>
+  ),
   notFoundComponent: () => (
     <div className="p-10 text-center text-muted-foreground">Employee not found.</div>
   ),
@@ -43,15 +49,29 @@ function InfoRow({ label, value, icon: Icon }: { label: string; value: React.Rea
 
 function EmployeePage() {
   const { id } = Route.useParams();
-  const emp = useStore((s) => s.employees.find((e) => e.id === id)!);
-  const company = useStore((s) => s.companies.find((c) => c.code === emp.companyCode));
-  const empTasks = useStore((s) =>
-    s.tasks.filter((t) => t.assignedEmployeeId === id).sort((a, b) => b.dueDate.localeCompare(a.dueDate)),
+  const emp = useStore((s) => s.employees.find((e) => e.id === id));
+  const company = useStore((s) => s.companies.find((c) => c.code === emp?.companyCode));
+  const allTasks = useStore((s) => s.tasks);
+  const allRequests = useStore((s) => s.requests);
+  const allPayroll = useStore((s) => s.payrollIssues);
+
+  const empTasks = useMemo(
+    () => allTasks.filter((t) => t.assignedEmployeeId === id).sort((a, b) => b.dueDate.localeCompare(a.dueDate)),
+    [allTasks, id],
   );
-  const empRequests = useStore((s) =>
-    s.requests.filter((r) => r.employeeId === id).sort((a, b) => b.submittedAt.localeCompare(a.submittedAt)),
+  const empRequests = useMemo(
+    () => allRequests.filter((r) => r.employeeId === id).sort((a, b) => b.submittedAt.localeCompare(a.submittedAt)),
+    [allRequests, id],
   );
-  const empPayroll = useStore((s) => s.payrollIssues.filter((p) => p.employeeId === id));
+  const empPayroll = useMemo(
+    () => allPayroll.filter((p) => p.employeeId === id),
+    [allPayroll, id],
+  );
+
+  if (!emp) {
+    return <div className="p-10 text-center text-muted-foreground">Employee not found.</div>;
+  }
+
 
   const initials = emp.name.split(" ").map((n) => n[0]).join("").slice(0, 2);
 
