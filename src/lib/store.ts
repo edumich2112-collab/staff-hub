@@ -11,7 +11,10 @@ import {
   type EmployeeRequest,
   type RequestStatus,
   type PayrollIssue,
+  type NoteEntry,
+  type CompanyHistoryEntry,
 } from "./mock-data";
+
 
 interface State {
   companies: Company[];
