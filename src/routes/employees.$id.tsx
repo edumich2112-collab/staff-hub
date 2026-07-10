@@ -219,18 +219,23 @@ function EmployeePage() {
           <CardHeader className="pb-2">
             <CardTitle className="flex items-center gap-2 text-sm font-semibold">
               <FileText className="h-4 w-4 text-muted-foreground" />
-              Documents & Notes
+              Company History
             </CardTitle>
           </CardHeader>
-          <CardContent className="pt-0 text-sm text-muted-foreground">
-            <p className="mb-3">
-              W-2, I-9, direct deposit forms, and other documents appear here once uploaded.
-            </p>
-            <div className="rounded-md border bg-muted/30 p-3 text-foreground">
-              {emp.notes || "No general notes yet."}
-            </div>
+          <CardContent className="pt-0">
+            <CompanyHistorySection employeeId={emp.id} currentCode={emp.companyCode} currentPosition={emp.position} hireDate={emp.hireDate} />
           </CardContent>
         </Card>
+
+        <Card className="lg:col-span-2">
+          <CardHeader className="pb-2">
+            <CardTitle className="text-sm font-semibold">Notes</CardTitle>
+          </CardHeader>
+          <CardContent className="pt-0">
+            <NotesSection employeeId={emp.id} generalNote={emp.notes} />
+          </CardContent>
+        </Card>
+
       </div>
     </div>
   );
