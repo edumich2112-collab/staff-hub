@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
-import { useMemo } from "react";
-import { ArrowLeft, Mail, Phone, MapPin, ShieldAlert, FileText, CheckCircle2 } from "lucide-react";
+import { useMemo, useState } from "react";
+import { ArrowLeft, Mail, Phone, MapPin, ShieldAlert, FileText, CheckCircle2, Plus } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   Table,
@@ -10,11 +10,30 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useStore } from "@/lib/store";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import { useStore, store } from "@/lib/store";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { EmployeeStatusPill, StatusPill, PriorityBadge } from "@/components/pills";
 import { AddRequestDialog } from "@/components/add-request-dialog";
 import { employees as employeeList } from "@/lib/mock-data";
+
 
 export const Route = createFileRoute("/employees/$id")({
   loader: ({ params }) => {
