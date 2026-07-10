@@ -95,6 +95,26 @@ export const store = {
     };
     emit();
   },
+  addEmployeeNote(id: string, text: string, author?: string) {
+    const entry: NoteEntry = { at: new Date().toISOString(), text, author };
+    state = {
+      ...state,
+      employees: state.employees.map((e) =>
+        e.id === id ? { ...e, noteLog: [entry, ...(e.noteLog ?? [])] } : e,
+      ),
+    };
+    emit();
+  },
+  addCompanyHistory(id: string, entry: CompanyHistoryEntry) {
+    state = {
+      ...state,
+      employees: state.employees.map((e) =>
+        e.id === id ? { ...e, companyHistory: [entry, ...(e.companyHistory ?? [])] } : e,
+      ),
+    };
+    emit();
+  },
+
   resolvePayroll(id: string) {
     state = {
       ...state,
