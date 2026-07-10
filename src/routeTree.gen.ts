@@ -14,6 +14,7 @@ import { Route as RequestsRouteImport } from './routes/requests'
 import { Route as EmployeesRouteImport } from './routes/employees'
 import { Route as CompaniesRouteImport } from './routes/companies'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as EmployeesIndexRouteImport } from './routes/employees.index'
 import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
 import { Route as EmployeesIdRouteImport } from './routes/employees.$id'
 import { Route as CompaniesCodeRouteImport } from './routes/companies.$code'
@@ -43,6 +44,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EmployeesIndexRoute = EmployeesIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => EmployeesRoute,
+} as any)
 const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
   id: '/',
   path: '/',
@@ -68,15 +74,16 @@ export interface FileRoutesByFullPath {
   '/companies/$code': typeof CompaniesCodeRoute
   '/employees/$id': typeof EmployeesIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/employees/': typeof EmployeesIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/employees': typeof EmployeesRouteWithChildren
   '/requests': typeof RequestsRoute
   '/tasks': typeof TasksRoute
   '/companies/$code': typeof CompaniesCodeRoute
   '/employees/$id': typeof EmployeesIdRoute
   '/companies': typeof CompaniesIndexRoute
+  '/employees': typeof EmployeesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -88,6 +95,7 @@ export interface FileRoutesById {
   '/companies/$code': typeof CompaniesCodeRoute
   '/employees/$id': typeof EmployeesIdRoute
   '/companies/': typeof CompaniesIndexRoute
+  '/employees/': typeof EmployeesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -100,15 +108,16 @@ export interface FileRouteTypes {
     | '/companies/$code'
     | '/employees/$id'
     | '/companies/'
+    | '/employees/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
-    | '/employees'
     | '/requests'
     | '/tasks'
     | '/companies/$code'
     | '/employees/$id'
     | '/companies'
+    | '/employees'
   id:
     | '__root__'
     | '/'
@@ -119,6 +128,7 @@ export interface FileRouteTypes {
     | '/companies/$code'
     | '/employees/$id'
     | '/companies/'
+    | '/employees/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -166,6 +176,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/employees/': {
+      id: '/employees/'
+      path: '/'
+      fullPath: '/employees/'
+      preLoaderRoute: typeof EmployeesIndexRouteImport
+      parentRoute: typeof EmployeesRoute
+    }
     '/companies/': {
       id: '/companies/'
       path: '/'
@@ -206,10 +223,12 @@ const CompaniesRouteWithChildren = CompaniesRoute._addFileChildren(
 
 interface EmployeesRouteChildren {
   EmployeesIdRoute: typeof EmployeesIdRoute
+  EmployeesIndexRoute: typeof EmployeesIndexRoute
 }
 
 const EmployeesRouteChildren: EmployeesRouteChildren = {
   EmployeesIdRoute: EmployeesIdRoute,
+  EmployeesIndexRoute: EmployeesIndexRoute,
 }
 
 const EmployeesRouteWithChildren = EmployeesRoute._addFileChildren(
@@ -226,13 +245,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
