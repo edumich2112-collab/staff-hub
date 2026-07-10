@@ -21,7 +21,7 @@ import { useStore } from "@/lib/store";
 import { formatDate } from "@/lib/format";
 import { EmployeeStatusPill } from "@/components/pills";
 
-export const Route = createFileRoute("/employees")({
+export const Route = createFileRoute("/employees/")({
   head: () => ({ meta: [{ title: "Employees — Staffhub" }] }),
   component: EmployeesPage,
 });
