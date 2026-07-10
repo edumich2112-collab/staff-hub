@@ -240,3 +240,154 @@ function EmployeePage() {
     </div>
   );
 }
+
+function CompanyHistorySection({
+  employeeId,
+  currentCode,
+  currentPosition,
+  hireDate,
+}: {
+  employeeId: string;
+  currentCode: string;
+  currentPosition: string;
+  hireDate: string;
+}) {
+  const emp = useStore((s) => s.employees.find((e) => e.id === employeeId));
+  const companies = useStore((s) => s.companies);
+  const [open, setOpen] = useState(false);
+  const [companyCode, setCompanyCode] = useState(currentCode);
+  const [position, setPosition] = useState("");
+  const [from, setFrom] = useState("");
+  const [to, setTo] = useState("");
+  const [note, setNote] = useState("");
+
+  const history = emp?.companyHistory ?? [];
+  const combined = useMemo(
+    () => [
+      { companyCode: currentCode, position: currentPosition, from: hireDate, to: undefined, note: "Current assignment", current: true },
+      ...history.map((h) => ({ ...h, current: false })),
+    ],
+    [history, currentCode, currentPosition, hireDate],
+  );
+
+  const codeToName = (code: string) => companies.find((c) => c.code === code)?.name ?? code;
+
+  function submit() {
+    if (!companyCode || !from) return;
+    store.addCompanyHistory(employeeId, { companyCode, position: position || undefined, from, to: to || undefined, note: note || undefined });
+    setOpen(false);
+    setPosition("");
+    setFrom("");
+    setTo("");
+    setNote("");
+  }
+
+  return (
+    <div className="space-y-3">
+      <div className="flex justify-end">
+        <Dialog open={open} onOpenChange={setOpen}>
+          <DialogTrigger asChild>
+            <Button size="sm" variant="outline"><Plus className="mr-1 h-3.5 w-3.5" /> Add past assignment</Button>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader><DialogTitle>Add past assignment</DialogTitle></DialogHeader>
+            <div className="space-y-3">
+              <div>
+                <Label>Company</Label>
+                <Select value={companyCode} onValueChange={setCompanyCode}>
+                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectContent>
+                    {companies.map((c) => (<SelectItem key={c.code} value={c.code}>{c.name}</SelectItem>))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label>Position</Label>
+                <Input value={position} onChange={(e) => setPosition(e.target.value)} placeholder="e.g. Groundskeeper" />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <Label>Start</Label>
+                  <Input type="date" value={from} onChange={(e) => setFrom(e.target.value)} />
+                </div>
+                <div>
+                  <Label>End</Label>
+                  <Input type="date" value={to} onChange={(e) => setTo(e.target.value)} />
+                </div>
+              </div>
+              <div>
+                <Label>Note</Label>
+                <Textarea value={note} onChange={(e) => setNote(e.target.value)} rows={2} />
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
+                <Button onClick={submit}>Save</Button>
+              </div>
+            </div>
+          </DialogContent>
+        </Dialog>
+      </div>
+      <div className="divide-y">
+        {combined.map((h, i) => (
+          <div key={i} className="py-2.5">
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-sm font-medium">{codeToName(h.companyCode)}</span>
+              {h.position && <span className="text-xs text-muted-foreground">· {h.position}</span>}
+              {h.current && <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[10px] font-medium text-primary">Current</span>}
+              <span className="ml-auto text-xs text-muted-foreground">
+                {formatDate(h.from)} — {h.to ? formatDate(h.to) : "Present"}
+              </span>
+            </div>
+            {h.note && <p className="mt-1 text-sm text-foreground/90">{h.note}</p>}
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function NotesSection({ employeeId, generalNote }: { employeeId: string; generalNote: string }) {
+  const emp = useStore((s) => s.employees.find((e) => e.id === employeeId));
+  const [text, setText] = useState("");
+  const log = emp?.noteLog ?? [];
+
+  function submit() {
+    if (!text.trim()) return;
+    store.addEmployeeNote(employeeId, text.trim());
+    setText("");
+  }
+
+  return (
+    <div className="space-y-3">
+      {generalNote && (
+        <div className="rounded-md border bg-muted/30 p-3 text-sm text-foreground">{generalNote}</div>
+      )}
+      <div className="space-y-2">
+        <Textarea
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Add a note. Timestamped and saved to this employee."
+          rows={2}
+        />
+        <div className="flex justify-end">
+          <Button size="sm" onClick={submit} disabled={!text.trim()}>
+            <Plus className="mr-1 h-3.5 w-3.5" /> Add note
+          </Button>
+        </div>
+      </div>
+      {log.length === 0 ? (
+        <p className="text-sm text-muted-foreground">No notes yet.</p>
+      ) : (
+        <div className="divide-y">
+          {log.map((n, i) => (
+            <div key={i} className="py-2.5">
+              <div className="text-xs text-muted-foreground">{formatDateTime(n.at)}{n.author ? ` · ${n.author}` : ""}</div>
+              <p className="mt-1 text-sm text-foreground/90 whitespace-pre-wrap">{n.text}</p>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
