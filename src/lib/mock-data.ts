@@ -17,6 +17,20 @@ export interface Company {
   notes: string;
 }
 
+export interface CompanyHistoryEntry {
+  companyCode: string;
+  position?: string;
+  from: string;
+  to?: string;
+  note?: string;
+}
+
+export interface NoteEntry {
+  at: string;
+  author?: string;
+  text: string;
+}
+
 export interface Employee {
   id: string;
   employeeNumber: string;
@@ -34,7 +48,10 @@ export interface Employee {
   directDeposit: "Active" | "Pending" | "None";
   notes: string;
   scheduledStartDate?: string;
+  companyHistory?: CompanyHistoryEntry[];
+  noteLog?: NoteEntry[];
 }
+
 
 export interface Task {
   id: string;
