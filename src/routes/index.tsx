@@ -265,6 +265,7 @@ function Dashboard() {
           icon={DollarSign}
           count={openPayroll.length}
           empty="All caught up."
+          action={<AddPayrollDialog />}
         >
           {openPayroll.map((p) => (
             <div key={p.id} className="flex items-center gap-3 py-3">
