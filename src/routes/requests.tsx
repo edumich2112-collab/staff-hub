@@ -61,11 +61,14 @@ function RequestsPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Requests</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {filtered.length} of {requests.length}
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Requests</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {filtered.length} of {requests.length}
+          </p>
+        </div>
+        <AddRequestDialog />
       </div>
 
       <Card>
