@@ -71,6 +71,7 @@ function SectionCard({
   children,
   empty,
   icon: Icon,
+  action,
 }: {
   title: string;
   href?: string;
@@ -78,6 +79,7 @@ function SectionCard({
   children: React.ReactNode;
   empty?: string;
   icon: React.ComponentType<{ className?: string }>;
+  action?: React.ReactNode;
 }) {
   return (
     <Card className="flex flex-col">
@@ -91,14 +93,17 @@ function SectionCard({
             </span>
           )}
         </CardTitle>
-        {href && (
-          <Link
-            to={href}
-            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-          >
-            View all <ArrowRight className="h-3 w-3" />
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {action}
+          {href && (
+            <Link
+              to={href}
+              className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+            >
+              View all <ArrowRight className="h-3 w-3" />
+            </Link>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex-1 pt-0">
         {count === 0 && empty ? (
