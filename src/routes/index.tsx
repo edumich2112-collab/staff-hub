@@ -241,6 +241,7 @@ function Dashboard() {
           href="/requests"
           count={openRequests.length}
           empty="No open requests."
+          action={<AddRequestDialog />}
         >
           {openRequests.map((r) => (
             <div key={r.id} className="flex items-center gap-3 py-3">
