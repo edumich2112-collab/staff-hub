@@ -163,8 +163,9 @@ function CompanyPage() {
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-semibold">Payroll Issues</CardTitle>
+              <AddPayrollDialog companyCode={code} triggerLabel="Add" />
             </CardHeader>
             <CardContent className="space-y-2">
               {payroll.length === 0 && (
@@ -186,8 +187,9 @@ function CompanyPage() {
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-semibold">Employee Requests</CardTitle>
+              <AddRequestDialog companyCode={code} triggerLabel="Add" />
             </CardHeader>
             <CardContent className="space-y-2">
               {requests.length === 0 && (
@@ -204,6 +206,15 @@ function CompanyPage() {
                   </div>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-semibold">Quick add</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AddTaskDialog companyCode={code} triggerLabel="New task for this client" variant="outline" />
             </CardContent>
           </Card>
         </div>
