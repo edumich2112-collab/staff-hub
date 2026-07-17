@@ -23,6 +23,7 @@ import { daysUntil, formatDate } from "@/lib/format";
 import { PriorityBadge, TaskStatusPill } from "@/components/pills";
 import { cn } from "@/lib/utils";
 import type { TaskStatus } from "@/lib/mock-data";
+import { AddTaskDialog } from "@/components/add-task-dialog";
 
 export const Route = createFileRoute("/tasks")({
   head: () => ({
@@ -72,11 +73,14 @@ function TasksPage() {
 
   return (
     <div className="mx-auto max-w-[1400px] space-y-4">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Tasks</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {filtered.length} of {tasks.length} tasks
-        </p>
+      <div className="flex items-start justify-between gap-3">
+        <div>
+          <h1 className="text-2xl font-semibold tracking-tight">Tasks</h1>
+          <p className="mt-1 text-sm text-muted-foreground">
+            {filtered.length} of {tasks.length} tasks
+          </p>
+        </div>
+        <AddTaskDialog />
       </div>
 
       <Card>

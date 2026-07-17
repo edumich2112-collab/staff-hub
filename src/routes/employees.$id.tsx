@@ -32,7 +32,10 @@ import { useStore, store } from "@/lib/store";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { EmployeeStatusPill, StatusPill, PriorityBadge } from "@/components/pills";
 import { AddRequestDialog } from "@/components/add-request-dialog";
+import { AddPayrollDialog } from "@/components/add-payroll-dialog";
+import { AddTaskDialog } from "@/components/add-task-dialog";
 import { employees as employeeList } from "@/lib/mock-data";
+import type { RequestStatus } from "@/lib/mock-data";
 
 
 export const Route = createFileRoute("/employees/$id")({
@@ -147,7 +150,10 @@ function EmployeePage() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-semibold">Payroll</CardTitle></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-semibold">Payroll</CardTitle>
+            <AddPayrollDialog employeeId={emp.id} companyCode={emp.companyCode} triggerLabel="Add issue" />
+          </CardHeader>
           <CardContent className="pt-0 space-y-3">
             <InfoRow label="Direct Deposit" value={<StatusPill status={emp.directDeposit} />} />
             {empPayroll.length === 0 ? (
@@ -164,6 +170,13 @@ function EmployeePage() {
                   </div>
                   {p.amount && (
                     <div className="mt-1 text-xs text-muted-foreground">${p.amount.toFixed(2)}</div>
+                  )}
+                  {p.status === "Open" && (
+                    <div className="mt-2 flex justify-end">
+                      <Button size="sm" variant="ghost" onClick={() => store.resolvePayroll(p.id)}>
+                        <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Mark resolved
+                      </Button>
+                    </div>
                   )}
                 </div>
               ))
@@ -190,7 +203,19 @@ function EmployeePage() {
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-medium">{r.type}</span>
                       <PriorityBadge priority={r.priority} />
-                      <StatusPill status={r.status} />
+                      <Select
+                        value={r.status}
+                        onValueChange={(v) => store.updateRequest(r.id, { status: v as RequestStatus })}
+                      >
+                        <SelectTrigger className="h-7 w-32 border-none bg-transparent p-0 shadow-none focus:ring-0">
+                          <StatusPill status={r.status} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="Open">Open</SelectItem>
+                          <SelectItem value="In Progress">In Progress</SelectItem>
+                          <SelectItem value="Resolved">Resolved</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <span className="ml-auto text-xs text-muted-foreground">
                         Submitted {formatDate(r.submittedAt)}
                         {r.assignedTo && ` · ${r.assignedTo}`}
@@ -213,7 +238,10 @@ function EmployeePage() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-semibold">Task History</CardTitle></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-semibold">Task History</CardTitle>
+            <AddTaskDialog employeeId={emp.id} companyCode={emp.companyCode} triggerLabel="Add task" variant="outline" />
+          </CardHeader>
           <CardContent className="pt-0">
             {empTasks.length === 0 ? (
               <p className="py-4 text-sm text-muted-foreground">No task history.</p>
@@ -226,7 +254,19 @@ function EmployeePage() {
                       <div className="text-xs text-muted-foreground">Due {formatDate(t.dueDate)}</div>
                     </div>
                     <PriorityBadge priority={t.priority} />
-                    <StatusPill status={t.status} />
+                    <Select
+                      value={t.status}
+                      onValueChange={(v) => store.updateTask(t.id, { status: v as any })}
+                    >
+                      <SelectTrigger className="h-7 w-28 border-none bg-transparent p-0 shadow-none focus:ring-0">
+                        <StatusPill status={t.status} />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="Open">Open</SelectItem>
+                        <SelectItem value="In Progress">In Progress</SelectItem>
+                        <SelectItem value="Completed">Completed</SelectItem>
+                      </SelectContent>
+                    </Select>
                   </div>
                 ))}
               </div>

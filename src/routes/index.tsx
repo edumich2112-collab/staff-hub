@@ -15,6 +15,9 @@ import { useStore } from "@/lib/store";
 import { daysUntil, formatDate, relativeDay } from "@/lib/format";
 import { PriorityBadge, StatusPill } from "@/components/pills";
 import { cn } from "@/lib/utils";
+import { AddTaskDialog } from "@/components/add-task-dialog";
+import { AddRequestDialog } from "@/components/add-request-dialog";
+import { AddPayrollDialog } from "@/components/add-payroll-dialog";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -71,6 +74,7 @@ function SectionCard({
   children,
   empty,
   icon: Icon,
+  action,
 }: {
   title: string;
   href?: string;
@@ -78,6 +82,7 @@ function SectionCard({
   children: React.ReactNode;
   empty?: string;
   icon: React.ComponentType<{ className?: string }>;
+  action?: React.ReactNode;
 }) {
   return (
     <Card className="flex flex-col">
@@ -91,14 +96,17 @@ function SectionCard({
             </span>
           )}
         </CardTitle>
-        {href && (
-          <Link
-            to={href}
-            className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
-          >
-            View all <ArrowRight className="h-3 w-3" />
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {action}
+          {href && (
+            <Link
+              to={href}
+              className="inline-flex items-center gap-1 text-xs font-medium text-muted-foreground hover:text-foreground"
+            >
+              View all <ArrowRight className="h-3 w-3" />
+            </Link>
+          )}
+        </div>
       </CardHeader>
       <CardContent className="flex-1 pt-0">
         {count === 0 && empty ? (
@@ -204,6 +212,7 @@ function Dashboard() {
           href="/tasks"
           count={upcoming.length}
           empty="No upcoming tasks."
+          action={<AddTaskDialog />}
         >
           {upcoming.map((t) => (
             <div key={t.id} className="flex items-center gap-3 py-3">
@@ -232,6 +241,7 @@ function Dashboard() {
           href="/requests"
           count={openRequests.length}
           empty="No open requests."
+          action={<AddRequestDialog />}
         >
           {openRequests.map((r) => (
             <div key={r.id} className="flex items-center gap-3 py-3">
@@ -255,6 +265,7 @@ function Dashboard() {
           icon={DollarSign}
           count={openPayroll.length}
           empty="All caught up."
+          action={<AddPayrollDialog />}
         >
           {openPayroll.map((p) => (
             <div key={p.id} className="flex items-center gap-3 py-3">

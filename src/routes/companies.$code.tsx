@@ -28,6 +28,9 @@ import { store, useStore } from "@/lib/store";
 import { formatDate } from "@/lib/format";
 import { StatusPill } from "@/components/pills";
 import { companies as companyList, type Employee, type EmployeeStatus } from "@/lib/mock-data";
+import { AddPayrollDialog } from "@/components/add-payroll-dialog";
+import { AddRequestDialog } from "@/components/add-request-dialog";
+import { AddTaskDialog } from "@/components/add-task-dialog";
 
 const STATUSES: EmployeeStatus[] = ["Active", "Pending Start", "On Assignment", "Former"];
 
@@ -160,8 +163,9 @@ function CompanyPage() {
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-semibold">Payroll Issues</CardTitle>
+              <AddPayrollDialog companyCode={code} triggerLabel="Add" />
             </CardHeader>
             <CardContent className="space-y-2">
               {payroll.length === 0 && (
@@ -183,8 +187,9 @@ function CompanyPage() {
           </Card>
 
           <Card>
-            <CardHeader className="pb-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
               <CardTitle className="text-sm font-semibold">Employee Requests</CardTitle>
+              <AddRequestDialog companyCode={code} triggerLabel="Add" />
             </CardHeader>
             <CardContent className="space-y-2">
               {requests.length === 0 && (
@@ -201,6 +206,15 @@ function CompanyPage() {
                   </div>
                 </div>
               ))}
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+              <CardTitle className="text-sm font-semibold">Quick add</CardTitle>
+            </CardHeader>
+            <CardContent>
+              <AddTaskDialog companyCode={code} triggerLabel="New task for this client" variant="outline" />
             </CardContent>
           </Card>
         </div>
