@@ -212,6 +212,7 @@ function Dashboard() {
           href="/tasks"
           count={upcoming.length}
           empty="No upcoming tasks."
+          action={<AddTaskDialog />}
         >
           {upcoming.map((t) => (
             <div key={t.id} className="flex items-center gap-3 py-3">
