@@ -23,6 +23,7 @@ import { daysUntil, formatDate } from "@/lib/format";
 import { PriorityBadge, TaskStatusPill } from "@/components/pills";
 import { cn } from "@/lib/utils";
 import type { TaskStatus } from "@/lib/mock-data";
+import { AddTaskDialog } from "@/components/add-task-dialog";
 
 export const Route = createFileRoute("/tasks")({
   head: () => ({
