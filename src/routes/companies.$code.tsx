@@ -28,6 +28,9 @@ import { store, useStore } from "@/lib/store";
 import { formatDate } from "@/lib/format";
 import { StatusPill } from "@/components/pills";
 import { companies as companyList, type Employee, type EmployeeStatus } from "@/lib/mock-data";
+import { AddPayrollDialog } from "@/components/add-payroll-dialog";
+import { AddRequestDialog } from "@/components/add-request-dialog";
+import { AddTaskDialog } from "@/components/add-task-dialog";
 
 const STATUSES: EmployeeStatus[] = ["Active", "Pending Start", "On Assignment", "Former"];
 
