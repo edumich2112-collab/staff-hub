@@ -150,7 +150,10 @@ function EmployeePage() {
         </Card>
 
         <Card>
-          <CardHeader className="pb-2"><CardTitle className="text-sm font-semibold">Payroll</CardTitle></CardHeader>
+          <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
+            <CardTitle className="text-sm font-semibold">Payroll</CardTitle>
+            <AddPayrollDialog employeeId={emp.id} companyCode={emp.companyCode} triggerLabel="Add issue" />
+          </CardHeader>
           <CardContent className="pt-0 space-y-3">
             <InfoRow label="Direct Deposit" value={<StatusPill status={emp.directDeposit} />} />
             {empPayroll.length === 0 ? (
@@ -167,6 +170,13 @@ function EmployeePage() {
                   </div>
                   {p.amount && (
                     <div className="mt-1 text-xs text-muted-foreground">${p.amount.toFixed(2)}</div>
+                  )}
+                  {p.status === "Open" && (
+                    <div className="mt-2 flex justify-end">
+                      <Button size="sm" variant="ghost" onClick={() => store.resolvePayroll(p.id)}>
+                        <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Mark resolved
+                      </Button>
+                    </div>
                   )}
                 </div>
               ))
