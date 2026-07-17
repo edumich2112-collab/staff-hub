@@ -21,6 +21,7 @@ import { useStore, store } from "@/lib/store";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { PriorityBadge, RequestStatusPill } from "@/components/pills";
 import type { RequestStatus } from "@/lib/mock-data";
+import { AddRequestDialog } from "@/components/add-request-dialog";
 
 export const Route = createFileRoute("/requests")({
   head: () => ({ meta: [{ title: "Requests — Staffhub" }] }),
