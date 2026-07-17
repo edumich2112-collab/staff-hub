@@ -31,6 +31,16 @@ function emit() {
   listeners.forEach((l) => l());
 }
 
+function appendNote(employeeId: string, text: string) {
+  const entry: NoteEntry = { at: new Date().toISOString(), text, author: "System" };
+  state = {
+    ...state,
+    employees: state.employees.map((e) =>
+      e.id === employeeId ? { ...e, noteLog: [entry, ...(e.noteLog ?? [])] } : e,
+    ),
+  };
+}
+
 export const store = {
   get: () => state,
   subscribe(l: () => void) {
@@ -38,6 +48,7 @@ export const store = {
     return () => listeners.delete(l);
   },
   updateTask(id: string, patch: Partial<Task>) {
+    const prev = state.tasks.find((t) => t.id === id);
     state = {
       ...state,
       tasks: state.tasks.map((t) =>
@@ -55,9 +66,30 @@ export const store = {
           : t,
       ),
     };
+    if (
+      prev &&
+      patch.status === "Completed" &&
+      prev.status !== "Completed" &&
+      prev.assignedEmployeeId
+    ) {
+      appendNote(
+        prev.assignedEmployeeId,
+        `✓ Task completed: "${prev.title}"${prev.notes ? ` — ${prev.notes}` : ""}`,
+      );
+    }
+    emit();
+  },
+  addTask(t: Omit<Task, "id" | "status"> & { status?: TaskStatus }) {
+    const newTask: Task = {
+      id: `t_${Date.now()}`,
+      status: t.status ?? "Open",
+      ...t,
+    } as Task;
+    state = { ...state, tasks: [newTask, ...state.tasks] };
     emit();
   },
   updateRequest(id: string, patch: Partial<EmployeeRequest>) {
+    const prev = state.requests.find((r) => r.id === id);
     state = {
       ...state,
       requests: state.requests.map((r) =>
@@ -75,6 +107,12 @@ export const store = {
           : r,
       ),
     };
+    if (prev && patch.status === "Resolved" && prev.status !== "Resolved") {
+      appendNote(
+        prev.employeeId,
+        `✓ Request resolved: ${prev.type}${prev.notes ? ` — ${prev.notes}` : ""}`,
+      );
+    }
     emit();
   },
   addRequest(req: Omit<EmployeeRequest, "id" | "submittedAt" | "status"> & { status?: RequestStatus }) {
@@ -114,17 +152,44 @@ export const store = {
     };
     emit();
   },
-
+  addPayrollIssue(p: Omit<PayrollIssue, "id" | "reportedAt" | "status"> & { status?: PayrollIssue["status"] }) {
+    const newP: PayrollIssue = {
+      id: `p_${Date.now()}`,
+      reportedAt: new Date().toISOString().slice(0, 10),
+      status: p.status ?? "Open",
+      ...p,
+    };
+    state = { ...state, payrollIssues: [newP, ...state.payrollIssues] };
+    emit();
+  },
   resolvePayroll(id: string) {
+    const prev = state.payrollIssues.find((p) => p.id === id);
     state = {
       ...state,
       payrollIssues: state.payrollIssues.map((p) =>
         p.id === id ? { ...p, status: "Resolved" } : p,
       ),
     };
+    if (prev && prev.status !== "Resolved") {
+      const amt = prev.amount ? ` ($${prev.amount.toFixed(2)})` : "";
+      appendNote(prev.employeeId, `✓ Payroll issue resolved: ${prev.issue}${amt}`);
+    }
+    emit();
+  },
+  updatePayroll(id: string, patch: Partial<PayrollIssue>) {
+    if (patch.status === "Resolved") {
+      this.resolvePayroll(id);
+      return;
+    }
+    state = {
+      ...state,
+      payrollIssues: state.payrollIssues.map((p) => (p.id === id ? { ...p, ...patch } : p)),
+    };
     emit();
   },
 };
+
+import type { TaskStatus } from "./mock-data";
 
 export function useStore<T>(selector: (s: State) => T): T {
   return useSyncExternalStore(
