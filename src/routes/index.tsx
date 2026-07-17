@@ -15,6 +15,9 @@ import { useStore } from "@/lib/store";
 import { daysUntil, formatDate, relativeDay } from "@/lib/format";
 import { PriorityBadge, StatusPill } from "@/components/pills";
 import { cn } from "@/lib/utils";
+import { AddTaskDialog } from "@/components/add-task-dialog";
+import { AddRequestDialog } from "@/components/add-request-dialog";
+import { AddPayrollDialog } from "@/components/add-payroll-dialog";
 
 export const Route = createFileRoute("/")({
   head: () => ({
