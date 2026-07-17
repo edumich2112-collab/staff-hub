@@ -32,7 +32,10 @@ import { useStore, store } from "@/lib/store";
 import { formatDate, formatDateTime } from "@/lib/format";
 import { EmployeeStatusPill, StatusPill, PriorityBadge } from "@/components/pills";
 import { AddRequestDialog } from "@/components/add-request-dialog";
+import { AddPayrollDialog } from "@/components/add-payroll-dialog";
+import { AddTaskDialog } from "@/components/add-task-dialog";
 import { employees as employeeList } from "@/lib/mock-data";
+import type { RequestStatus } from "@/lib/mock-data";
 
 
 export const Route = createFileRoute("/employees/$id")({
