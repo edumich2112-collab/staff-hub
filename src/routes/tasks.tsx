@@ -24,6 +24,9 @@ import { PriorityBadge, TaskStatusPill } from "@/components/pills";
 import { cn } from "@/lib/utils";
 import type { TaskStatus } from "@/lib/mock-data";
 import { AddTaskDialog } from "@/components/add-task-dialog";
+import { EditTaskDialog } from "@/components/edit-task-dialog";
+import { Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/tasks")({
   head: () => ({
@@ -144,6 +147,7 @@ function TasksPage() {
               <TableHead>Company</TableHead>
               <TableHead>Assigned</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="w-10"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -160,10 +164,14 @@ function TasksPage() {
                     />
                   </TableCell>
                   <TableCell>
-                    <div className={cn("font-medium", t.status === "Completed" && "line-through")}>
-                      {t.title}
-                    </div>
-                    {t.notes && <div className="text-xs text-muted-foreground">{t.notes}</div>}
+                    <EditTaskDialog task={t}>
+                      <button className="text-left">
+                        <div className={cn("font-medium hover:text-primary", t.status === "Completed" && "line-through")}>
+                          {t.title}
+                        </div>
+                        {t.notes && <div className="text-xs text-muted-foreground">{t.notes}</div>}
+                      </button>
+                    </EditTaskDialog>
                   </TableCell>
                   <TableCell>
                     <div className={cn("text-sm", overdue && "text-destructive font-medium")}>
@@ -174,12 +182,19 @@ function TasksPage() {
                   <TableCell className="text-sm">{compName(t.companyCode)}</TableCell>
                   <TableCell className="text-sm">{empName(t.assignedEmployeeId)}</TableCell>
                   <TableCell><TaskStatusPill status={t.status} /></TableCell>
+                  <TableCell>
+                    <EditTaskDialog task={t}>
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    </EditTaskDialog>
+                  </TableCell>
                 </TableRow>
               );
             })}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
+                <TableCell colSpan={8} className="py-10 text-center text-sm text-muted-foreground">
                   No tasks match your filters.
                 </TableCell>
               </TableRow>

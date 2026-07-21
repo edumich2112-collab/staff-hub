@@ -22,6 +22,9 @@ import { formatDate, formatDateTime } from "@/lib/format";
 import { PriorityBadge, RequestStatusPill } from "@/components/pills";
 import type { RequestStatus } from "@/lib/mock-data";
 import { AddRequestDialog } from "@/components/add-request-dialog";
+import { EditRequestDialog } from "@/components/edit-request-dialog";
+import { Pencil } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/requests")({
   head: () => ({ meta: [{ title: "Requests — Staffhub" }] }),
@@ -111,6 +114,7 @@ function RequestsPage() {
               <TableHead>Priority</TableHead>
               <TableHead>Assigned</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="w-10"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -131,7 +135,11 @@ function RequestsPage() {
                     {r.companyCode}
                   </Link>
                 </TableCell>
-                <TableCell className="text-sm">{r.type}</TableCell>
+                <TableCell className="text-sm">
+                  <EditRequestDialog request={r}>
+                    <button className="text-left hover:text-primary">{r.type}</button>
+                  </EditRequestDialog>
+                </TableCell>
                 <TableCell className="text-sm text-muted-foreground">
                   {formatDate(r.submittedAt)}
                   {r.completedAt && (
@@ -157,11 +165,18 @@ function RequestsPage() {
                     </SelectContent>
                   </Select>
                 </TableCell>
+                <TableCell>
+                  <EditRequestDialog request={r}>
+                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </EditRequestDialog>
+                </TableCell>
               </TableRow>
             ))}
             {filtered.length === 0 && (
               <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-sm text-muted-foreground">
+                <TableCell colSpan={8} className="py-10 text-center text-sm text-muted-foreground">
                   No requests match your filters.
                 </TableCell>
               </TableRow>

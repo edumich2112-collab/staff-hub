@@ -34,6 +34,10 @@ import { EmployeeStatusPill, StatusPill, PriorityBadge } from "@/components/pill
 import { AddRequestDialog } from "@/components/add-request-dialog";
 import { AddPayrollDialog } from "@/components/add-payroll-dialog";
 import { AddTaskDialog } from "@/components/add-task-dialog";
+import { EditTaskDialog } from "@/components/edit-task-dialog";
+import { EditRequestDialog } from "@/components/edit-request-dialog";
+import { EditPayrollDialog } from "@/components/edit-payroll-dialog";
+import { Pencil } from "lucide-react";
 import { employees as employeeList } from "@/lib/mock-data";
 import type { RequestStatus } from "@/lib/mock-data";
 
@@ -160,25 +164,20 @@ function EmployeePage() {
               <p className="text-sm text-muted-foreground">No payroll issues.</p>
             ) : (
               empPayroll.map((p) => (
-                <div key={p.id} className="rounded-md border p-3">
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-2 text-sm font-medium">
-                      <ShieldAlert className="h-3.5 w-3.5 text-warning" />
-                      {p.issue}
+                <EditPayrollDialog key={p.id} payroll={p}>
+                  <button className="w-full rounded-md border p-3 text-left transition-colors hover:border-ring/40 hover:bg-muted/30">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2 text-sm font-medium">
+                        <ShieldAlert className="h-3.5 w-3.5 text-warning" />
+                        {p.issue}
+                      </div>
+                      <StatusPill status={p.status} />
                     </div>
-                    <StatusPill status={p.status} />
-                  </div>
-                  {p.amount && (
-                    <div className="mt-1 text-xs text-muted-foreground">${p.amount.toFixed(2)}</div>
-                  )}
-                  {p.status === "Open" && (
-                    <div className="mt-2 flex justify-end">
-                      <Button size="sm" variant="ghost" onClick={() => store.resolvePayroll(p.id)}>
-                        <CheckCircle2 className="mr-1 h-3.5 w-3.5" /> Mark resolved
-                      </Button>
-                    </div>
-                  )}
-                </div>
+                    {p.amount && (
+                      <div className="mt-1 text-xs text-muted-foreground">${p.amount.toFixed(2)}</div>
+                    )}
+                  </button>
+                </EditPayrollDialog>
               ))
             )}
           </CardContent>
@@ -199,7 +198,7 @@ function EmployeePage() {
             ) : (
               <div className="divide-y">
                 {empRequests.map((r) => (
-                  <div key={r.id} className="py-3">
+                  <div key={r.id} className="group py-3">
                     <div className="flex flex-wrap items-center gap-2">
                       <span className="text-sm font-medium">{r.type}</span>
                       <PriorityBadge priority={r.priority} />
@@ -220,6 +219,11 @@ function EmployeePage() {
                         Submitted {formatDate(r.submittedAt)}
                         {r.assignedTo && ` · ${r.assignedTo}`}
                       </span>
+                      <EditRequestDialog request={r}>
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100">
+                          <Pencil className="h-3.5 w-3.5" />
+                        </Button>
+                      </EditRequestDialog>
                     </div>
                     {r.notes && (
                       <p className="mt-1.5 text-sm text-foreground/90">{r.notes}</p>
