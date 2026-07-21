@@ -31,6 +31,8 @@ import { companies as companyList, type Employee, type EmployeeStatus } from "@/
 import { AddPayrollDialog } from "@/components/add-payroll-dialog";
 import { AddRequestDialog } from "@/components/add-request-dialog";
 import { AddTaskDialog } from "@/components/add-task-dialog";
+import { EditRequestDialog } from "@/components/edit-request-dialog";
+import { EditPayrollDialog } from "@/components/edit-payroll-dialog";
 
 const STATUSES: EmployeeStatus[] = ["Active", "Pending Start", "On Assignment", "Former"];
 
