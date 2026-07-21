@@ -18,6 +18,9 @@ import { cn } from "@/lib/utils";
 import { AddTaskDialog } from "@/components/add-task-dialog";
 import { AddRequestDialog } from "@/components/add-request-dialog";
 import { AddPayrollDialog } from "@/components/add-payroll-dialog";
+import { EditTaskDialog } from "@/components/edit-task-dialog";
+import { EditRequestDialog } from "@/components/edit-request-dialog";
+import { EditPayrollDialog } from "@/components/edit-payroll-dialog";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -186,23 +189,25 @@ function Dashboard() {
           empty="Nothing overdue. Nice."
         >
           {pastDue.map((t) => (
-            <div key={t.id} className="flex items-center gap-3 py-3">
-              <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-medium">{t.title}</div>
-                <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="text-destructive">{relativeDay(t.dueDate)}</span>
-                  <span>·</span>
-                  <span>{t.companyCode ?? "—"}</span>
-                  {t.assignedEmployeeId && (
-                    <>
-                      <span>·</span>
-                      <span className="truncate">{empName(t.assignedEmployeeId)}</span>
-                    </>
-                  )}
+            <EditTaskDialog key={t.id} task={t}>
+              <button className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-muted/40 -mx-2 px-2 rounded-md">
+                <div className="flex-1 min-w-0">
+                  <div className="truncate text-sm font-medium">{t.title}</div>
+                  <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="text-destructive">{relativeDay(t.dueDate)}</span>
+                    <span>·</span>
+                    <span>{t.companyCode ?? "—"}</span>
+                    {t.assignedEmployeeId && (
+                      <>
+                        <span>·</span>
+                        <span className="truncate">{empName(t.assignedEmployeeId)}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <PriorityBadge priority={t.priority} />
-            </div>
+                <PriorityBadge priority={t.priority} />
+              </button>
+            </EditTaskDialog>
           ))}
         </SectionCard>
 
@@ -215,23 +220,25 @@ function Dashboard() {
           action={<AddTaskDialog />}
         >
           {upcoming.map((t) => (
-            <div key={t.id} className="flex items-center gap-3 py-3">
-              <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-medium">{t.title}</div>
-                <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{relativeDay(t.dueDate)}</span>
-                  <span>·</span>
-                  <span>{t.companyCode ?? "—"}</span>
-                  {t.assignedEmployeeId && (
-                    <>
-                      <span>·</span>
-                      <span className="truncate">{empName(t.assignedEmployeeId)}</span>
-                    </>
-                  )}
+            <EditTaskDialog key={t.id} task={t}>
+              <button className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-muted/40 -mx-2 px-2 rounded-md">
+                <div className="flex-1 min-w-0">
+                  <div className="truncate text-sm font-medium">{t.title}</div>
+                  <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{relativeDay(t.dueDate)}</span>
+                    <span>·</span>
+                    <span>{t.companyCode ?? "—"}</span>
+                    {t.assignedEmployeeId && (
+                      <>
+                        <span>·</span>
+                        <span className="truncate">{empName(t.assignedEmployeeId)}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <PriorityBadge priority={t.priority} />
-            </div>
+                <PriorityBadge priority={t.priority} />
+              </button>
+            </EditTaskDialog>
           ))}
         </SectionCard>
 
@@ -244,19 +251,21 @@ function Dashboard() {
           action={<AddRequestDialog />}
         >
           {openRequests.map((r) => (
-            <div key={r.id} className="flex items-center gap-3 py-3">
-              <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-medium">{r.type}</div>
-                <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="truncate">{empName(r.employeeId)}</span>
-                  <span>·</span>
-                  <span>{r.companyCode}</span>
-                  <span>·</span>
-                  <span>{relativeDay(r.submittedAt)}</span>
+            <EditRequestDialog key={r.id} request={r}>
+              <button className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-muted/40 -mx-2 px-2 rounded-md">
+                <div className="flex-1 min-w-0">
+                  <div className="truncate text-sm font-medium">{r.type}</div>
+                  <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="truncate">{empName(r.employeeId)}</span>
+                    <span>·</span>
+                    <span>{r.companyCode}</span>
+                    <span>·</span>
+                    <span>{relativeDay(r.submittedAt)}</span>
+                  </div>
                 </div>
-              </div>
-              <StatusPill status={r.status} />
-            </div>
+                <StatusPill status={r.status} />
+              </button>
+            </EditRequestDialog>
           ))}
         </SectionCard>
 
@@ -268,23 +277,25 @@ function Dashboard() {
           action={<AddPayrollDialog />}
         >
           {openPayroll.map((p) => (
-            <div key={p.id} className="flex items-center gap-3 py-3">
-              <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-medium">{p.issue}</div>
-                <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span className="truncate">{empName(p.employeeId)}</span>
-                  <span>·</span>
-                  <span>{p.companyCode}</span>
-                  {p.amount && (
-                    <>
-                      <span>·</span>
-                      <span>${p.amount.toFixed(2)}</span>
-                    </>
-                  )}
+            <EditPayrollDialog key={p.id} payroll={p}>
+              <button className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-muted/40 -mx-2 px-2 rounded-md">
+                <div className="flex-1 min-w-0">
+                  <div className="truncate text-sm font-medium">{p.issue}</div>
+                  <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span className="truncate">{empName(p.employeeId)}</span>
+                    <span>·</span>
+                    <span>{p.companyCode}</span>
+                    {p.amount && (
+                      <>
+                        <span>·</span>
+                        <span>${p.amount.toFixed(2)}</span>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-              <StatusPill status="Open" tone="warning" />
-            </div>
+                <StatusPill status="Open" tone="warning" />
+              </button>
+            </EditPayrollDialog>
           ))}
         </SectionCard>
 
@@ -326,19 +337,21 @@ function Dashboard() {
           empty="No completed tasks yet."
         >
           {recentDone.map((t) => (
-            <div key={t.id} className="flex items-center gap-3 py-3">
-              <div className="flex-1 min-w-0">
-                <div className="truncate text-sm text-muted-foreground line-through">
-                  {t.title}
+            <EditTaskDialog key={t.id} task={t}>
+              <button className="flex w-full items-center gap-3 py-3 text-left transition-colors hover:bg-muted/40 -mx-2 px-2 rounded-md">
+                <div className="flex-1 min-w-0">
+                  <div className="truncate text-sm text-muted-foreground line-through">
+                    {t.title}
+                  </div>
+                  <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                    <span>{t.completedAt ? relativeDay(t.completedAt) : ""}</span>
+                    <span>·</span>
+                    <span>{t.companyCode ?? "—"}</span>
+                  </div>
                 </div>
-                <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                  <span>{t.completedAt ? relativeDay(t.completedAt) : ""}</span>
-                  <span>·</span>
-                  <span>{t.companyCode ?? "—"}</span>
-                </div>
-              </div>
-              <StatusPill status="Completed" />
-            </div>
+                <StatusPill status="Completed" />
+              </button>
+            </EditTaskDialog>
           ))}
         </SectionCard>
       </div>

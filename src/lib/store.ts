@@ -187,6 +187,18 @@ export const store = {
     };
     emit();
   },
+  deleteTask(id: string) {
+    state = { ...state, tasks: state.tasks.filter((t) => t.id !== id) };
+    emit();
+  },
+  deleteRequest(id: string) {
+    state = { ...state, requests: state.requests.filter((r) => r.id !== id) };
+    emit();
+  },
+  deletePayroll(id: string) {
+    state = { ...state, payrollIssues: state.payrollIssues.filter((p) => p.id !== id) };
+    emit();
+  },
 };
 
 import type { TaskStatus } from "./mock-data";
