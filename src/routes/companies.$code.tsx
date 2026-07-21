@@ -200,15 +200,17 @@ function CompanyPage() {
                 <p className="text-sm text-muted-foreground">No requests.</p>
               )}
               {requests.map((r) => (
-                <div key={r.id} className="rounded-md border p-3">
-                  <div className="flex items-start justify-between gap-2">
-                    <div className="text-sm font-medium">{r.type}</div>
-                    <StatusPill status={r.status} />
-                  </div>
-                  <div className="mt-1 text-xs text-muted-foreground">
-                    {empName(r.employeeId)} · {formatDate(r.submittedAt)}
-                  </div>
-                </div>
+                <EditRequestDialog key={r.id} request={r}>
+                  <button className="w-full rounded-md border p-3 text-left transition-colors hover:border-ring/40 hover:bg-muted/30">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="text-sm font-medium">{r.type}</div>
+                      <StatusPill status={r.status} />
+                    </div>
+                    <div className="mt-1 text-xs text-muted-foreground">
+                      {empName(r.employeeId)} · {formatDate(r.submittedAt)}
+                    </div>
+                  </button>
+                </EditRequestDialog>
               ))}
             </CardContent>
           </Card>
