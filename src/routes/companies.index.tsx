@@ -4,6 +4,7 @@ import { Building2, ArrowRight } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
+import { AddCompanyDialog } from "@/components/add-company-dialog";
 
 export const Route = createFileRoute("/companies/")({
   head: () => ({ meta: [{ title: "Companies — Staffhub" }] }),
@@ -46,12 +47,15 @@ function CompaniesPage() {
           <h1 className="text-2xl font-semibold tracking-tight">Companies</h1>
           <p className="mt-1 text-sm text-muted-foreground">{filtered.length} clients</p>
         </div>
-        <Input
-          placeholder="Search companies…"
-          value={q}
-          onChange={(e) => setQ(e.target.value)}
-          className="w-64"
-        />
+        <div className="flex items-center gap-2">
+          <Input
+            placeholder="Search companies…"
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            className="w-64"
+          />
+          <AddCompanyDialog />
+        </div>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
