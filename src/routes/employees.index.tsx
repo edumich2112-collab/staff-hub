@@ -154,3 +154,50 @@ function EmployeesPage() {
     </div>
   );
 }
+
+const STATUSES: EmployeeStatus[] = ["Active", "Pending Start", "On Assignment", "Former"];
+
+function InlineStatusEditor({ employee }: { employee: Employee }) {
+  function onChange(v: string) {
+    const next = v as EmployeeStatus;
+    if (next === employee.status) return;
+    if (next === "Former") {
+      const today = new Date().toISOString().slice(0, 10);
+      store.terminateEmployee(employee.id, today);
+      return;
+    }
+    if (next === "Pending Start") {
+      const today = new Date().toISOString().slice(0, 10);
+      store.updateEmployee(employee.id, {
+        status: next,
+        scheduledStartDate: employee.scheduledStartDate ?? today,
+      });
+      return;
+    }
+    store.updateEmployee(employee.id, { status: next, scheduledStartDate: undefined });
+  }
+  return (
+    <div className="flex items-center gap-1.5">
+      <Select value={employee.status} onValueChange={onChange}>
+        <SelectTrigger className="h-7 w-[130px] text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {STATUSES.map((s) => (
+            <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {employee.status === "Pending Start" && (
+        <input
+          type="date"
+          value={employee.scheduledStartDate ?? ""}
+          onChange={(ev) =>
+            store.updateEmployee(employee.id, { scheduledStartDate: ev.target.value })
+          }
+          className="h-7 rounded-md border bg-background px-1.5 text-xs"
+        />
+      )}
+    </div>
+  );
+}
