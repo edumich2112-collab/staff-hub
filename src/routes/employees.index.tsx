@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { Pencil } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -17,9 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useStore } from "@/lib/store";
-import { formatDate } from "@/lib/format";
-import { EmployeeStatusPill } from "@/components/pills";
+import { store, useStore } from "@/lib/store";
+import type { Employee, EmployeeStatus } from "@/lib/mock-data";
+import { EditEmployeeDialog } from "@/components/edit-employee-dialog";
 
 export const Route = createFileRoute("/employees/")({
   head: () => ({ meta: [{ title: "Employees — Staffhub" }] }),
