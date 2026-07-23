@@ -133,6 +133,75 @@ export const store = {
     };
     emit();
   },
+  addCompany(c: Company) {
+    if (state.companies.some((x) => x.code === c.code)) return;
+    state = { ...state, companies: [...state.companies, c] };
+    emit();
+  },
+  changeEmployeeCompany(id: string, newCode: string, startDate: string, note?: string) {
+    const prev = state.employees.find((e) => e.id === id);
+    if (!prev || newCode === prev.companyCode) return;
+    const today = new Date().toISOString().slice(0, 10);
+    const historyEntry: CompanyHistoryEntry = {
+      companyCode: prev.companyCode,
+      position: prev.position,
+      from: prev.hireDate || prev.scheduledStartDate || today,
+      to: today,
+      note: note || "Transferred",
+    };
+    const scheduled = startDate > today;
+    state = {
+      ...state,
+      employees: state.employees.map((e) =>
+        e.id === id
+          ? {
+              ...e,
+              companyCode: newCode,
+              currentAssignment: newCode,
+              hireDate: scheduled ? e.hireDate : startDate,
+              scheduledStartDate: scheduled ? startDate : undefined,
+              status: scheduled ? "Pending Start" : "Active",
+              companyHistory: [historyEntry, ...(e.companyHistory ?? [])],
+            }
+          : e,
+      ),
+    };
+    appendNote(id, `↔ Transferred from ${prev.companyCode} to ${newCode} (start ${startDate})`);
+    emit();
+  },
+  terminateEmployee(id: string, endDate: string, reason?: string) {
+    const prev = state.employees.find((e) => e.id === id);
+    if (!prev) return;
+    const historyEntry: CompanyHistoryEntry | null =
+      prev.companyCode && prev.companyCode !== "FORMER"
+        ? {
+            companyCode: prev.companyCode,
+            position: prev.position,
+            from: prev.hireDate || endDate,
+            to: endDate,
+            note: reason || "Terminated",
+          }
+        : null;
+    state = {
+      ...state,
+      employees: state.employees.map((e) =>
+        e.id === id
+          ? {
+              ...e,
+              status: "Former",
+              companyCode: "FORMER",
+              currentAssignment: "",
+              scheduledStartDate: undefined,
+              companyHistory: historyEntry
+                ? [historyEntry, ...(e.companyHistory ?? [])]
+                : e.companyHistory,
+            }
+          : e,
+      ),
+    };
+    appendNote(id, `✗ Ended employment on ${endDate}${reason ? ` — ${reason}` : ""}`);
+    emit();
+  },
   addEmployeeNote(id: string, text: string, author?: string) {
     const entry: NoteEntry = { at: new Date().toISOString(), text, author };
     state = {

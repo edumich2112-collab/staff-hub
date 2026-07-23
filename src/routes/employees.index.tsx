@@ -1,7 +1,9 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
+import { Pencil } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
 import {
   Select,
   SelectContent,
@@ -17,9 +19,9 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { useStore } from "@/lib/store";
-import { formatDate } from "@/lib/format";
-import { EmployeeStatusPill } from "@/components/pills";
+import { store, useStore } from "@/lib/store";
+import type { Employee, EmployeeStatus } from "@/lib/mock-data";
+import { EditEmployeeDialog } from "@/components/edit-employee-dialog";
 
 export const Route = createFileRoute("/employees/")({
   head: () => ({ meta: [{ title: "Employees — Staffhub" }] }),
@@ -105,6 +107,7 @@ function EmployeesPage() {
               <TableHead>Phone</TableHead>
               <TableHead>Pay</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="w-10"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -128,7 +131,16 @@ function EmployeesPage() {
                 <TableCell className="text-sm">{e.position}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{e.phone}</TableCell>
                 <TableCell className="text-sm">${e.payRate.toFixed(2)}</TableCell>
-                <TableCell><EmployeeStatusPill status={e.status} /></TableCell>
+                <TableCell>
+                  <InlineStatusEditor employee={e} />
+                </TableCell>
+                <TableCell>
+                  <EditEmployeeDialog employee={e}>
+                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </EditEmployeeDialog>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
@@ -139,6 +151,53 @@ function EmployeesPage() {
           </div>
         )}
       </Card>
+    </div>
+  );
+}
+
+const STATUSES: EmployeeStatus[] = ["Active", "Pending Start", "On Assignment", "Former"];
+
+function InlineStatusEditor({ employee }: { employee: Employee }) {
+  function onChange(v: string) {
+    const next = v as EmployeeStatus;
+    if (next === employee.status) return;
+    if (next === "Former") {
+      const today = new Date().toISOString().slice(0, 10);
+      store.terminateEmployee(employee.id, today);
+      return;
+    }
+    if (next === "Pending Start") {
+      const today = new Date().toISOString().slice(0, 10);
+      store.updateEmployee(employee.id, {
+        status: next,
+        scheduledStartDate: employee.scheduledStartDate ?? today,
+      });
+      return;
+    }
+    store.updateEmployee(employee.id, { status: next, scheduledStartDate: undefined });
+  }
+  return (
+    <div className="flex items-center gap-1.5">
+      <Select value={employee.status} onValueChange={onChange}>
+        <SelectTrigger className="h-7 w-[130px] text-xs">
+          <SelectValue />
+        </SelectTrigger>
+        <SelectContent>
+          {STATUSES.map((s) => (
+            <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+      {employee.status === "Pending Start" && (
+        <input
+          type="date"
+          value={employee.scheduledStartDate ?? ""}
+          onChange={(ev) =>
+            store.updateEmployee(employee.id, { scheduledStartDate: ev.target.value })
+          }
+          className="h-7 rounded-md border bg-background px-1.5 text-xs"
+        />
+      )}
     </div>
   );
 }

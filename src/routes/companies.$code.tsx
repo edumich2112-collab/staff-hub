@@ -294,18 +294,27 @@ function EmployeeTable({ rows }: { rows: Employee[] }) {
 }
 
 function StatusEditor({ employee }: { employee: Employee }) {
+  function onChange(v: string) {
+    const next = v as EmployeeStatus;
+    if (next === employee.status) return;
+    if (next === "Former") {
+      const today = new Date().toISOString().slice(0, 10);
+      store.terminateEmployee(employee.id, today);
+      return;
+    }
+    if (next === "Pending Start") {
+      const today = new Date().toISOString().slice(0, 10);
+      store.updateEmployee(employee.id, {
+        status: next,
+        scheduledStartDate: employee.scheduledStartDate ?? today,
+      });
+      return;
+    }
+    store.updateEmployee(employee.id, { status: next, scheduledStartDate: undefined });
+  }
   return (
     <div className="flex items-center gap-1.5">
-      <Select
-        value={employee.status}
-        onValueChange={(v) =>
-          store.updateEmployee(employee.id, {
-            status: v as EmployeeStatus,
-            scheduledStartDate:
-              v === "Pending Start" ? employee.scheduledStartDate : undefined,
-          })
-        }
-      >
+      <Select value={employee.status} onValueChange={onChange}>
         <SelectTrigger className="h-7 w-[130px] text-xs">
           <SelectValue />
         </SelectTrigger>
