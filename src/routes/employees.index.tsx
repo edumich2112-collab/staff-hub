@@ -107,6 +107,7 @@ function EmployeesPage() {
               <TableHead>Phone</TableHead>
               <TableHead>Pay</TableHead>
               <TableHead>Status</TableHead>
+              <TableHead className="w-10"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -130,7 +131,16 @@ function EmployeesPage() {
                 <TableCell className="text-sm">{e.position}</TableCell>
                 <TableCell className="text-sm text-muted-foreground">{e.phone}</TableCell>
                 <TableCell className="text-sm">${e.payRate.toFixed(2)}</TableCell>
-                <TableCell><EmployeeStatusPill status={e.status} /></TableCell>
+                <TableCell>
+                  <InlineStatusEditor employee={e} />
+                </TableCell>
+                <TableCell>
+                  <EditEmployeeDialog employee={e}>
+                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                      <Pencil className="h-3.5 w-3.5" />
+                    </Button>
+                  </EditEmployeeDialog>
+                </TableCell>
               </TableRow>
             ))}
           </TableBody>
