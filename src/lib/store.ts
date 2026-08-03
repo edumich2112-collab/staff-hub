@@ -138,6 +138,15 @@ export const store = {
     state = { ...state, companies: [...state.companies, c] };
     emit();
   },
+  updateCompany(code: string, patch: Partial<Omit<Company, "code">>) {
+    state = {
+      ...state,
+      companies: state.companies.map((company) =>
+        company.code === code ? { ...company, ...patch } : company,
+      ),
+    };
+    emit();
+  },
   changeEmployeeCompany(id: string, newCode: string, startDate: string, note?: string) {
     const prev = state.employees.find((e) => e.id === id);
     if (!prev || newCode === prev.companyCode) return;

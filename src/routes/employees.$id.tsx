@@ -37,6 +37,7 @@ import { AddTaskDialog } from "@/components/add-task-dialog";
 import { EditTaskDialog } from "@/components/edit-task-dialog";
 import { EditRequestDialog } from "@/components/edit-request-dialog";
 import { EditPayrollDialog } from "@/components/edit-payroll-dialog";
+import { EditEmployeeDialog } from "@/components/edit-employee-dialog";
 import { Pencil } from "lucide-react";
 import { employees as employeeList } from "@/lib/mock-data";
 import type { RequestStatus } from "@/lib/mock-data";
@@ -125,6 +126,11 @@ function EmployeePage() {
             <EmployeeStatusPill status={emp.status} />
           </div>
         </div>
+        <EditEmployeeDialog employee={emp}>
+          <Button variant="outline" size="sm">
+            <Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit employee
+          </Button>
+        </EditEmployeeDialog>
       </div>
 
       <div className="grid gap-4 lg:grid-cols-3">
@@ -220,7 +226,7 @@ function EmployeePage() {
                         {r.assignedTo && ` · ${r.assignedTo}`}
                       </span>
                       <EditRequestDialog request={r}>
-                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100">
+                        <Button size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label="Edit request" title="Edit request">
                           <Pencil className="h-3.5 w-3.5" />
                         </Button>
                       </EditRequestDialog>
@@ -272,7 +278,7 @@ function EmployeePage() {
                       </SelectContent>
                     </Select>
                     <EditTaskDialog task={t}>
-                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0 opacity-0 group-hover:opacity-100">
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label="Edit task" title="Edit task">
                         <Pencil className="h-3.5 w-3.5" />
                       </Button>
                     </EditTaskDialog>

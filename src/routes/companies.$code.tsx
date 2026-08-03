@@ -1,6 +1,6 @@
 import { createFileRoute, Link, notFound } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Building2, ArrowLeft } from "lucide-react";
+import { Building2, ArrowLeft, Pencil } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
@@ -33,6 +33,9 @@ import { AddRequestDialog } from "@/components/add-request-dialog";
 import { AddTaskDialog } from "@/components/add-task-dialog";
 import { EditRequestDialog } from "@/components/edit-request-dialog";
 import { EditPayrollDialog } from "@/components/edit-payroll-dialog";
+import { EditEmployeeDialog } from "@/components/edit-employee-dialog";
+import { EditCompanyDialog } from "@/components/edit-company-dialog";
+import { Button } from "@/components/ui/button";
 
 const STATUSES: EmployeeStatus[] = ["Active", "Pending Start", "On Assignment", "Former"];
 
@@ -112,6 +115,9 @@ function CompanyPage() {
           </div>
           <p className="mt-0.5 text-sm text-muted-foreground">{company.location}</p>
         </div>
+        <EditCompanyDialog company={company}>
+          <Button variant="outline" size="sm"><Pencil className="mr-1.5 h-3.5 w-3.5" /> Edit company</Button>
+        </EditCompanyDialog>
       </div>
 
       <div className="grid gap-4 md:grid-cols-4">
@@ -251,6 +257,7 @@ function EmployeeTable({ rows }: { rows: Employee[] }) {
           <TableHead>Pay Rate</TableHead>
           <TableHead>Start Date</TableHead>
           <TableHead className="w-[210px]">Status</TableHead>
+          <TableHead className="w-10"><span className="sr-only">Edit</span></TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -279,11 +286,18 @@ function EmployeeTable({ rows }: { rows: Employee[] }) {
             <TableCell>
               <StatusEditor employee={e} />
             </TableCell>
+            <TableCell>
+              <EditEmployeeDialog employee={e}>
+                <Button size="sm" variant="ghost" className="h-8 w-8 p-0" aria-label={`Edit ${e.name}`} title={`Edit ${e.name}`}>
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              </EditEmployeeDialog>
+            </TableCell>
           </TableRow>
         ))}
         {rows.length === 0 && (
           <TableRow>
-            <TableCell colSpan={6} className="py-8 text-center text-sm text-muted-foreground">
+            <TableCell colSpan={7} className="py-8 text-center text-sm text-muted-foreground">
               No employees.
             </TableCell>
           </TableRow>

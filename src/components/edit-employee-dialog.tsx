@@ -34,9 +34,15 @@ export function EditEmployeeDialog({ employee, children }: Props) {
   const companies = useStore((s) => s.companies);
 
   const [name, setName] = useState(employee.name);
+  const [employeeNumber, setEmployeeNumber] = useState(employee.employeeNumber);
   const [phone, setPhone] = useState(employee.phone);
   const [email, setEmail] = useState(employee.email);
+  const [address, setAddress] = useState(employee.address);
+  const [emergencyContact, setEmergencyContact] = useState(employee.emergencyContact);
   const [position, setPosition] = useState(employee.position);
+  const [currentAssignment, setCurrentAssignment] = useState(employee.currentAssignment);
+  const [hireDate, setHireDate] = useState(employee.hireDate);
+  const [directDeposit, setDirectDeposit] = useState<Employee["directDeposit"]>(employee.directDeposit);
   const [payRate, setPayRate] = useState(String(employee.payRate));
   const [companyCode, setCompanyCode] = useState(employee.companyCode);
   const [startDate, setStartDate] = useState("");
@@ -49,9 +55,15 @@ export function EditEmployeeDialog({ employee, children }: Props) {
   useEffect(() => {
     if (open) {
       setName(employee.name);
+      setEmployeeNumber(employee.employeeNumber);
       setPhone(employee.phone);
       setEmail(employee.email);
+      setAddress(employee.address);
+      setEmergencyContact(employee.emergencyContact);
       setPosition(employee.position);
+      setCurrentAssignment(employee.currentAssignment);
+      setHireDate(employee.hireDate);
+      setDirectDeposit(employee.directDeposit);
       setPayRate(String(employee.payRate));
       setCompanyCode(employee.companyCode);
       setStartDate("");
@@ -79,9 +91,15 @@ export function EditEmployeeDialog({ employee, children }: Props) {
     // Base fields (always applied)
     store.updateEmployee(employee.id, {
       name: name.trim(),
+      employeeNumber: employeeNumber.trim(),
       phone: phone.trim(),
       email: email.trim(),
+      address: address.trim(),
+      emergencyContact: emergencyContact.trim(),
       position: position.trim(),
+      currentAssignment: currentAssignment.trim(),
+      hireDate,
+      directDeposit,
       payRate: Number(payRate) || 0,
       notes: notes.trim(),
     });
@@ -112,9 +130,23 @@ export function EditEmployeeDialog({ employee, children }: Props) {
           </DialogDescription>
         </DialogHeader>
         <div className="grid max-h-[70vh] gap-3 overflow-y-auto pr-1">
+          <div className="grid grid-cols-3 gap-3">
+            <div className="col-span-2 grid gap-1.5">
+              <Label>Full name</Label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Employee #</Label>
+              <Input value={employeeNumber} onChange={(e) => setEmployeeNumber(e.target.value)} />
+            </div>
+          </div>
           <div className="grid gap-1.5">
-            <Label>Full name</Label>
-            <Input value={name} onChange={(e) => setName(e.target.value)} />
+            <Label>Address</Label>
+            <Input value={address} onChange={(e) => setAddress(e.target.value)} />
+          </div>
+          <div className="grid gap-1.5">
+            <Label>Emergency contact</Label>
+            <Input value={emergencyContact} onChange={(e) => setEmergencyContact(e.target.value)} />
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
@@ -125,6 +157,27 @@ export function EditEmployeeDialog({ employee, children }: Props) {
               <Label>Email</Label>
               <Input value={email} onChange={(e) => setEmail(e.target.value)} />
             </div>
+          </div>
+          <div className="grid grid-cols-2 gap-3">
+            <div className="grid gap-1.5">
+              <Label>Current assignment</Label>
+              <Input value={currentAssignment} onChange={(e) => setCurrentAssignment(e.target.value)} />
+            </div>
+            <div className="grid gap-1.5">
+              <Label>Company start date</Label>
+              <Input type="date" value={hireDate} onChange={(e) => setHireDate(e.target.value)} />
+            </div>
+          </div>
+          <div className="grid gap-1.5">
+            <Label>Direct deposit</Label>
+            <Select value={directDeposit} onValueChange={(value) => setDirectDeposit(value as Employee["directDeposit"])}>
+              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectContent>
+                <SelectItem value="Active">Active</SelectItem>
+                <SelectItem value="Pending">Pending</SelectItem>
+                <SelectItem value="None">None</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">

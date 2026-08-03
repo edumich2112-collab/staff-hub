@@ -9,6 +9,7 @@ import {
   Building2,
   DollarSign,
   ArrowRight,
+  Pencil,
 } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useStore } from "@/lib/store";
@@ -206,6 +207,7 @@ function Dashboard() {
                   </div>
                 </div>
                 <PriorityBadge priority={t.priority} />
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </EditTaskDialog>
           ))}
@@ -237,6 +239,7 @@ function Dashboard() {
                   </div>
                 </div>
                 <PriorityBadge priority={t.priority} />
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </EditTaskDialog>
           ))}
@@ -264,6 +267,7 @@ function Dashboard() {
                   </div>
                 </div>
                 <StatusPill status={r.status} />
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </EditRequestDialog>
           ))}
@@ -294,6 +298,7 @@ function Dashboard() {
                   </div>
                 </div>
                 <StatusPill status="Open" tone="warning" />
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </EditPayrollDialog>
           ))}
@@ -306,12 +311,7 @@ function Dashboard() {
           empty="No new starts scheduled."
         >
           {startingSoon.map((e) => (
-            <Link
-              key={e.id}
-              to="/employees/$id"
-              params={{ id: e.id }}
-              className="flex items-center gap-3 py-3 hover:bg-muted/40 -mx-2 px-2 rounded-md"
-            >
+            <div key={e.id} className="flex items-center gap-3 py-3 hover:bg-muted/40 -mx-2 px-2 rounded-md">
               <div className="grid h-8 w-8 place-items-center rounded-full bg-primary/10 text-xs font-semibold text-primary">
                 {e.name
                   .split(" ")
@@ -320,13 +320,18 @@ function Dashboard() {
                   .slice(0, 2)}
               </div>
               <div className="flex-1 min-w-0">
-                <div className="truncate text-sm font-medium">{e.name}</div>
+                <Link to="/employees/$id" params={{ id: e.id }} className="truncate text-sm font-medium hover:text-primary hover:underline">{e.name}</Link>
                 <div className="mt-0.5 text-xs text-muted-foreground">
                   {e.position} · {e.companyCode} · starts {formatDate(e.hireDate)}
                 </div>
               </div>
               <StatusPill status="Pending Start" />
-            </Link>
+              <EditEmployeeDialog employee={e}>
+                <Button size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label={`Edit ${e.name}`} title={`Edit ${e.name}`}>
+                  <Pencil className="h-3.5 w-3.5" />
+                </Button>
+              </EditEmployeeDialog>
+            </div>
           ))}
         </SectionCard>
 
@@ -350,6 +355,7 @@ function Dashboard() {
                   </div>
                 </div>
                 <StatusPill status="Completed" />
+                <Pencil className="h-3.5 w-3.5 text-muted-foreground" />
               </button>
             </EditTaskDialog>
           ))}

@@ -1,10 +1,12 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
-import { Building2, ArrowRight } from "lucide-react";
+import { Building2, ArrowRight, Pencil } from "lucide-react";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { useStore } from "@/lib/store";
 import { AddCompanyDialog } from "@/components/add-company-dialog";
+import { EditCompanyDialog } from "@/components/edit-company-dialog";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/companies/")({
   head: () => ({ meta: [{ title: "Companies — Staffhub" }] }),
@@ -60,18 +62,22 @@ function CompaniesPage() {
 
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filtered.map((c) => (
-          <Link key={c.code} to="/companies/$code" params={{ code: c.code }}>
-            <Card className="group h-full transition-shadow hover:shadow-card">
+          <Card key={c.code} className="group h-full transition-shadow hover:shadow-card">
               <CardContent className="p-5">
                 <div className="flex items-start justify-between">
                   <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
                     <Building2 className="h-5 w-5" />
                   </div>
-                  <span className="rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
-                    {c.code}
-                  </span>
+                  <div className="flex items-center gap-1">
+                    <span className="rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">{c.code}</span>
+                    <EditCompanyDialog company={c}>
+                      <Button size="sm" variant="ghost" className="h-7 w-7 p-0" aria-label={`Edit ${c.name}`} title={`Edit ${c.name}`}>
+                        <Pencil className="h-3.5 w-3.5" />
+                      </Button>
+                    </EditCompanyDialog>
+                  </div>
                 </div>
-                <div className="mt-4 font-semibold">{c.name}</div>
+                <Link to="/companies/$code" params={{ code: c.code }} className="mt-4 block font-semibold hover:text-primary hover:underline">{c.name}</Link>
                 <div className="text-xs text-muted-foreground">{c.location}</div>
                 <div className="mt-4 grid grid-cols-3 gap-2 border-t pt-3 text-center">
                   <div>
@@ -87,12 +93,11 @@ function CompaniesPage() {
                     <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Total</div>
                   </div>
                 </div>
-                <div className="mt-4 flex items-center justify-end text-xs font-medium text-muted-foreground group-hover:text-primary">
+                <Link to="/companies/$code" params={{ code: c.code }} className="mt-4 flex items-center justify-end text-xs font-medium text-muted-foreground group-hover:text-primary">
                   Open <ArrowRight className="ml-1 h-3 w-3" />
-                </div>
+                </Link>
               </CardContent>
             </Card>
-          </Link>
         ))}
       </div>
     </div>
