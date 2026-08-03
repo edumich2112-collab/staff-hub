@@ -136,7 +136,7 @@ function EmployeesPage() {
                 </TableCell>
                 <TableCell>
                   <EditEmployeeDialog employee={e}>
-                    <Button size="sm" variant="ghost" className="h-7 w-7 p-0">
+                    <Button size="sm" variant="ghost" className="h-8 w-8 p-0" aria-label={`Edit ${e.name}`} title={`Edit ${e.name}`}>
                       <Pencil className="h-3.5 w-3.5" />
                     </Button>
                   </EditEmployeeDialog>
