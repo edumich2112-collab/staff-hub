@@ -22,6 +22,8 @@ import { AddPayrollDialog } from "@/components/add-payroll-dialog";
 import { EditTaskDialog } from "@/components/edit-task-dialog";
 import { EditRequestDialog } from "@/components/edit-request-dialog";
 import { EditPayrollDialog } from "@/components/edit-payroll-dialog";
+import { EditEmployeeDialog } from "@/components/edit-employee-dialog";
+import { Button } from "@/components/ui/button";
 
 export const Route = createFileRoute("/")({
   head: () => ({
