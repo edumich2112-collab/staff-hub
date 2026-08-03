@@ -16,6 +16,7 @@ export const Route = createFileRoute("/companies/")({
 function CompaniesPage() {
   const companies = useStore((s) => s.companies);
   const employees = useStore((s) => s.employees);
+  const requests = useStore((s) => s.requests);
   const [q, setQ] = useState("");
 
   const enriched = useMemo(
@@ -27,9 +28,12 @@ function CompaniesPage() {
           active: emps.filter((e) => e.status === "Active").length,
           pending: emps.filter((e) => e.status === "Pending Start").length,
           total: emps.length,
+          openRequests: requests.filter(
+            (r) => r.companyCode === c.code && r.status !== "Resolved",
+          ).length,
         };
       }),
-    [companies, employees],
+    [companies, employees, requests],
   );
 
   const filtered = enriched.filter((c) => {
@@ -79,7 +83,7 @@ function CompaniesPage() {
                 </div>
                 <Link to="/companies/$code" params={{ code: c.code }} className="mt-4 block font-semibold hover:text-primary hover:underline">{c.name}</Link>
                 <div className="text-xs text-muted-foreground">{c.location}</div>
-                <div className="mt-4 grid grid-cols-3 gap-2 border-t pt-3 text-center">
+                <div className="mt-4 grid grid-cols-4 gap-2 border-t pt-3 text-center">
                   <div>
                     <div className="text-sm font-semibold">{c.active}</div>
                     <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Active</div>
@@ -91,6 +95,10 @@ function CompaniesPage() {
                   <div>
                     <div className="text-sm font-semibold">{c.total}</div>
                     <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Total</div>
+                  </div>
+                  <div>
+                    <div className={`text-sm font-semibold ${c.openRequests > 0 ? "text-warning" : ""}`}>{c.openRequests}</div>
+                    <div className="text-[10px] uppercase tracking-wide text-muted-foreground">Open reqs</div>
                   </div>
                 </div>
                 <Link to="/companies/$code" params={{ code: c.code }} className="mt-4 flex items-center justify-end text-xs font-medium text-muted-foreground group-hover:text-primary">
