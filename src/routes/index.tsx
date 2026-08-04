@@ -141,6 +141,22 @@ function Dashboard() {
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
     .slice(0, 5);
   const openRequests = requests.filter((r) => r.status !== "Resolved").slice(0, 5);
+  const companyRequests = companies
+    .map((c) => {
+      const open = requests.filter(
+        (r) => r.companyCode === c.code && r.status !== "Resolved",
+      );
+      const latestReq = [...open].sort((a, b) => b.submittedAt.localeCompare(a.submittedAt))[0];
+      return {
+        code: c.code,
+        name: c.name,
+        open: open.length,
+        latest: latestReq ? latestReq.type : "—",
+      };
+    })
+    .filter((c) => c.open > 0)
+    .sort((a, b) => b.open - a.open)
+    .slice(0, 6);
   const openPayroll = payroll.filter((p) => p.status === "Open");
   const startingSoon = employees
     .filter((e) => e.status === "Pending Start")
@@ -274,6 +290,38 @@ function Dashboard() {
             </EditRequestDialog>
           ))}
         </SectionCard>
+
+        <SectionCard
+          title="Client Requests"
+          icon={Building2}
+          href="/companies"
+          count={companyRequests.length}
+          empty="No open client requests."
+          action={<AddRequestDialog />}
+        >
+          {companyRequests.map((c) => (
+            <Link
+              key={c.code}
+              to="/companies/$code"
+              params={{ code: c.code }}
+              className="-mx-2 flex w-full items-center gap-3 rounded-md px-2 py-3 text-left transition-colors hover:bg-muted/40"
+            >
+              <div className="min-w-0 flex-1">
+                <div className="truncate text-sm font-medium">{c.name}</div>
+                <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
+                  <span>{c.code}</span>
+                  <span>·</span>
+                  <span className="truncate">{c.latest}</span>
+                </div>
+              </div>
+              <span className="rounded-md bg-warning/15 px-1.5 py-0.5 text-[11px] font-semibold text-warning-foreground dark:text-warning">
+                {c.open} open
+              </span>
+              <ArrowRight className="h-3.5 w-3.5 text-muted-foreground" />
+            </Link>
+          ))}
+        </SectionCard>
+
 
         <SectionCard
           title="Payroll Issues"

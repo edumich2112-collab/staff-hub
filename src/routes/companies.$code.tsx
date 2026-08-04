@@ -198,28 +198,44 @@ function CompanyPage() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
-              <CardTitle className="text-sm font-semibold">Employee Requests</CardTitle>
-              <AddRequestDialog companyCode={code} triggerLabel="Add" />
+              <CardTitle className="text-sm font-semibold">
+                Open Requests
+                <span className="ml-2 rounded-md bg-muted px-1.5 py-0.5 text-[11px] font-medium text-muted-foreground">
+                  {requests.filter((r) => r.status !== "Resolved").length}
+                </span>
+              </CardTitle>
+              <AddRequestDialog companyCode={code} triggerLabel="Add request" />
             </CardHeader>
             <CardContent className="space-y-2">
               {requests.length === 0 && (
                 <p className="text-sm text-muted-foreground">No requests.</p>
               )}
-              {requests.map((r) => (
+              {[...requests]
+                .sort(
+                  (a, b) =>
+                    Number(a.status === "Resolved") - Number(b.status === "Resolved"),
+                )
+                .map((r) => (
                 <EditRequestDialog key={r.id} request={r}>
                   <button className="w-full rounded-md border p-3 text-left transition-colors hover:border-ring/40 hover:bg-muted/30">
                     <div className="flex items-start justify-between gap-2">
                       <div className="text-sm font-medium">{r.type}</div>
                       <StatusPill status={r.status} />
                     </div>
-                    <div className="mt-1 text-xs text-muted-foreground">
-                      {empName(r.employeeId)} · {formatDate(r.submittedAt)}
+                    <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground">
+                      <span className="truncate">
+                        {empName(r.employeeId)} · {formatDate(r.submittedAt)}
+                      </span>
+                      <span className="inline-flex items-center gap-1 font-medium">
+                        <Pencil className="h-3 w-3" /> Edit
+                      </span>
                     </div>
                   </button>
                 </EditRequestDialog>
               ))}
             </CardContent>
           </Card>
+
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between pb-2 space-y-0">
