@@ -28,7 +28,7 @@ import { EditTaskDialog } from "@/components/edit-task-dialog";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/tasks")({
+export const Route = createFileRoute("/_authenticated/tasks")({
   head: () => ({
     meta: [{ title: "Tasks — Staffhub" }],
   }),

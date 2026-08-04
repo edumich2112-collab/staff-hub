@@ -26,7 +26,7 @@ import { EditRequestDialog } from "@/components/edit-request-dialog";
 import { Pencil } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/requests")({
+export const Route = createFileRoute("/_authenticated/requests")({
   head: () => ({ meta: [{ title: "Requests — Staffhub" }] }),
   component: RequestsPage,
 });

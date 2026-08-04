@@ -43,7 +43,7 @@ import { employees as employeeList } from "@/lib/mock-data";
 import type { RequestStatus } from "@/lib/mock-data";
 
 
-export const Route = createFileRoute("/employees/$id")({
+export const Route = createFileRoute("/_authenticated/employees/$id")({
   loader: ({ params }) => {
     if (!employeeList.find((e) => e.id === params.id)) throw notFound();
     return { id: params.id };

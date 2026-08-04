@@ -23,7 +23,7 @@ import { store, useStore } from "@/lib/store";
 import type { Employee, EmployeeStatus } from "@/lib/mock-data";
 import { EditEmployeeDialog } from "@/components/edit-employee-dialog";
 
-export const Route = createFileRoute("/employees/")({
+export const Route = createFileRoute("/_authenticated/employees/")({
   head: () => ({ meta: [{ title: "Employees — Staffhub" }] }),
   component: EmployeesPage,
 });
