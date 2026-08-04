@@ -14,7 +14,345 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      companies: {
+        Row: {
+          code: string
+          created_at: string
+          location: string
+          name: string
+          notes: string
+          updated_at: string
+        }
+        Insert: {
+          code: string
+          created_at?: string
+          location?: string
+          name: string
+          notes?: string
+          updated_at?: string
+        }
+        Update: {
+          code?: string
+          created_at?: string
+          location?: string
+          name?: string
+          notes?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      company_history: {
+        Row: {
+          company_code: string
+          created_at: string
+          employee_id: string
+          from_date: string | null
+          id: string
+          note: string
+          position: string
+          to_date: string | null
+        }
+        Insert: {
+          company_code: string
+          created_at?: string
+          employee_id: string
+          from_date?: string | null
+          id?: string
+          note?: string
+          position?: string
+          to_date?: string | null
+        }
+        Update: {
+          company_code?: string
+          created_at?: string
+          employee_id?: string
+          from_date?: string | null
+          id?: string
+          note?: string
+          position?: string
+          to_date?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_history_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employee_notes: {
+        Row: {
+          at: string
+          author: string
+          employee_id: string
+          id: string
+          text: string
+        }
+        Insert: {
+          at?: string
+          author?: string
+          employee_id: string
+          id?: string
+          text: string
+        }
+        Update: {
+          at?: string
+          author?: string
+          employee_id?: string
+          id?: string
+          text?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employee_notes_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      employees: {
+        Row: {
+          address: string
+          company_code: string | null
+          created_at: string
+          current_assignment: string
+          direct_deposit: string
+          email: string
+          emergency_contact: string
+          employee_number: string
+          hire_date: string | null
+          id: string
+          name: string
+          notes: string
+          pay_rate: number
+          phone: string
+          position: string
+          scheduled_start_date: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          address?: string
+          company_code?: string | null
+          created_at?: string
+          current_assignment?: string
+          direct_deposit?: string
+          email?: string
+          emergency_contact?: string
+          employee_number?: string
+          hire_date?: string | null
+          id?: string
+          name: string
+          notes?: string
+          pay_rate?: number
+          phone?: string
+          position?: string
+          scheduled_start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          address?: string
+          company_code?: string | null
+          created_at?: string
+          current_assignment?: string
+          direct_deposit?: string
+          email?: string
+          emergency_contact?: string
+          employee_number?: string
+          hire_date?: string | null
+          id?: string
+          name?: string
+          notes?: string
+          pay_rate?: number
+          phone?: string
+          position?: string
+          scheduled_start_date?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "employees_company_code_fkey"
+            columns: ["company_code"]
+            isOneToOne: false
+            referencedRelation: "companies"
+            referencedColumns: ["code"]
+          },
+        ]
+      }
+      payroll_issues: {
+        Row: {
+          amount: number | null
+          company_code: string | null
+          created_at: string
+          employee_id: string | null
+          id: string
+          issue: string
+          reported_at: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          amount?: number | null
+          company_code?: string | null
+          created_at?: string
+          employee_id?: string | null
+          id?: string
+          issue: string
+          reported_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          amount?: number | null
+          company_code?: string | null
+          created_at?: string
+          employee_id?: string | null
+          id?: string
+          issue?: string
+          reported_at?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "payroll_issues_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      profiles: {
+        Row: {
+          created_at: string
+          email: string | null
+          full_name: string | null
+          id: string
+        }
+        Insert: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id: string
+        }
+        Update: {
+          created_at?: string
+          email?: string | null
+          full_name?: string | null
+          id?: string
+        }
+        Relationships: []
+      }
+      requests: {
+        Row: {
+          assigned_to: string
+          company_code: string | null
+          completed_at: string | null
+          created_at: string
+          employee_id: string | null
+          id: string
+          notes: string
+          priority: string
+          status: string
+          submitted_at: string
+          type: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_to?: string
+          company_code?: string | null
+          completed_at?: string | null
+          created_at?: string
+          employee_id?: string | null
+          id?: string
+          notes?: string
+          priority?: string
+          status?: string
+          submitted_at?: string
+          type?: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_to?: string
+          company_code?: string | null
+          completed_at?: string | null
+          created_at?: string
+          employee_id?: string | null
+          id?: string
+          notes?: string
+          priority?: string
+          status?: string
+          submitted_at?: string
+          type?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "requests_employee_id_fkey"
+            columns: ["employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      tasks: {
+        Row: {
+          assigned_employee_id: string | null
+          company_code: string | null
+          completed_at: string | null
+          created_at: string
+          due_date: string | null
+          id: string
+          notes: string
+          priority: string
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          assigned_employee_id?: string | null
+          company_code?: string | null
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          notes?: string
+          priority?: string
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          assigned_employee_id?: string | null
+          company_code?: string | null
+          completed_at?: string | null
+          created_at?: string
+          due_date?: string | null
+          id?: string
+          notes?: string
+          priority?: string
+          status?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "tasks_assigned_employee_id_fkey"
+            columns: ["assigned_employee_id"]
+            isOneToOne: false
+            referencedRelation: "employees"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Views: {
       [_ in never]: never
