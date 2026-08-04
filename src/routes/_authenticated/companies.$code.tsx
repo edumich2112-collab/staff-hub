@@ -39,7 +39,7 @@ import { Button } from "@/components/ui/button";
 
 const STATUSES: EmployeeStatus[] = ["Active", "Pending Start", "On Assignment", "Former"];
 
-export const Route = createFileRoute("/companies/$code")({
+export const Route = createFileRoute("/_authenticated/companies/$code")({
   loader: ({ params }) => {
     const c = companyList.find((c) => c.code === params.code);
     if (!c) throw notFound();

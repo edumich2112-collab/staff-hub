@@ -8,7 +8,7 @@ import { AddCompanyDialog } from "@/components/add-company-dialog";
 import { EditCompanyDialog } from "@/components/edit-company-dialog";
 import { Button } from "@/components/ui/button";
 
-export const Route = createFileRoute("/companies/")({
+export const Route = createFileRoute("/_authenticated/companies/")({
   head: () => ({ meta: [{ title: "Companies — Staffhub" }] }),
   component: CompaniesPage,
 });

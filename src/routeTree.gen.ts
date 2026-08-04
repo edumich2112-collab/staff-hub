@@ -9,98 +9,118 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as TasksRouteImport } from './routes/tasks'
-import { Route as RequestsRouteImport } from './routes/requests'
-import { Route as EmployeesRouteImport } from './routes/employees'
-import { Route as CompaniesRouteImport } from './routes/companies'
-import { Route as IndexRouteImport } from './routes/index'
-import { Route as EmployeesIndexRouteImport } from './routes/employees.index'
-import { Route as CompaniesIndexRouteImport } from './routes/companies.index'
-import { Route as EmployeesIdRouteImport } from './routes/employees.$id'
-import { Route as CompaniesCodeRouteImport } from './routes/companies.$code'
+import { Route as AuthRouteImport } from './routes/auth'
+import { Route as AuthenticatedRouteRouteImport } from './routes/_authenticated/route'
+import { Route as AuthenticatedIndexRouteImport } from './routes/_authenticated/index'
+import { Route as AuthenticatedTasksRouteImport } from './routes/_authenticated/tasks'
+import { Route as AuthenticatedRequestsRouteImport } from './routes/_authenticated/requests'
+import { Route as AuthenticatedEmployeesRouteImport } from './routes/_authenticated/employees'
+import { Route as AuthenticatedCompaniesRouteImport } from './routes/_authenticated/companies'
+import { Route as AuthenticatedEmployeesIndexRouteImport } from './routes/_authenticated/employees.index'
+import { Route as AuthenticatedCompaniesIndexRouteImport } from './routes/_authenticated/companies.index'
+import { Route as AuthenticatedEmployeesIdRouteImport } from './routes/_authenticated/employees.$id'
+import { Route as AuthenticatedCompaniesCodeRouteImport } from './routes/_authenticated/companies.$code'
 
-const TasksRoute = TasksRouteImport.update({
+const AuthRoute = AuthRouteImport.update({
+  id: '/auth',
+  path: '/auth',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRouteRoute = AuthenticatedRouteRouteImport.update({
+  id: '/_authenticated',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedIndexRoute = AuthenticatedIndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => AuthenticatedRouteRoute,
+} as any)
+const AuthenticatedTasksRoute = AuthenticatedTasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const RequestsRoute = RequestsRouteImport.update({
+const AuthenticatedRequestsRoute = AuthenticatedRequestsRouteImport.update({
   id: '/requests',
   path: '/requests',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const EmployeesRoute = EmployeesRouteImport.update({
+const AuthenticatedEmployeesRoute = AuthenticatedEmployeesRouteImport.update({
   id: '/employees',
   path: '/employees',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const CompaniesRoute = CompaniesRouteImport.update({
+const AuthenticatedCompaniesRoute = AuthenticatedCompaniesRouteImport.update({
   id: '/companies',
   path: '/companies',
-  getParentRoute: () => rootRouteImport,
+  getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
-const IndexRoute = IndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EmployeesIndexRoute = EmployeesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => EmployeesRoute,
-} as any)
-const CompaniesIndexRoute = CompaniesIndexRouteImport.update({
-  id: '/',
-  path: '/',
-  getParentRoute: () => CompaniesRoute,
-} as any)
-const EmployeesIdRoute = EmployeesIdRouteImport.update({
-  id: '/$id',
-  path: '/$id',
-  getParentRoute: () => EmployeesRoute,
-} as any)
-const CompaniesCodeRoute = CompaniesCodeRouteImport.update({
-  id: '/$code',
-  path: '/$code',
-  getParentRoute: () => CompaniesRoute,
-} as any)
+const AuthenticatedEmployeesIndexRoute =
+  AuthenticatedEmployeesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedEmployeesRoute,
+  } as any)
+const AuthenticatedCompaniesIndexRoute =
+  AuthenticatedCompaniesIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedCompaniesRoute,
+  } as any)
+const AuthenticatedEmployeesIdRoute =
+  AuthenticatedEmployeesIdRouteImport.update({
+    id: '/$id',
+    path: '/$id',
+    getParentRoute: () => AuthenticatedEmployeesRoute,
+  } as any)
+const AuthenticatedCompaniesCodeRoute =
+  AuthenticatedCompaniesCodeRouteImport.update({
+    id: '/$code',
+    path: '/$code',
+    getParentRoute: () => AuthenticatedCompaniesRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
-  '/': typeof IndexRoute
-  '/companies': typeof CompaniesRouteWithChildren
-  '/employees': typeof EmployeesRouteWithChildren
-  '/requests': typeof RequestsRoute
-  '/tasks': typeof TasksRoute
-  '/companies/$code': typeof CompaniesCodeRoute
-  '/employees/$id': typeof EmployeesIdRoute
-  '/companies/': typeof CompaniesIndexRoute
-  '/employees/': typeof EmployeesIndexRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/auth': typeof AuthRoute
+  '/companies': typeof AuthenticatedCompaniesRouteWithChildren
+  '/employees': typeof AuthenticatedEmployeesRouteWithChildren
+  '/requests': typeof AuthenticatedRequestsRoute
+  '/tasks': typeof AuthenticatedTasksRoute
+  '/companies/$code': typeof AuthenticatedCompaniesCodeRoute
+  '/employees/$id': typeof AuthenticatedEmployeesIdRoute
+  '/companies/': typeof AuthenticatedCompaniesIndexRoute
+  '/employees/': typeof AuthenticatedEmployeesIndexRoute
 }
 export interface FileRoutesByTo {
-  '/': typeof IndexRoute
-  '/requests': typeof RequestsRoute
-  '/tasks': typeof TasksRoute
-  '/companies/$code': typeof CompaniesCodeRoute
-  '/employees/$id': typeof EmployeesIdRoute
-  '/companies': typeof CompaniesIndexRoute
-  '/employees': typeof EmployeesIndexRoute
+  '/auth': typeof AuthRoute
+  '/requests': typeof AuthenticatedRequestsRoute
+  '/tasks': typeof AuthenticatedTasksRoute
+  '/': typeof AuthenticatedIndexRoute
+  '/companies/$code': typeof AuthenticatedCompaniesCodeRoute
+  '/employees/$id': typeof AuthenticatedEmployeesIdRoute
+  '/companies': typeof AuthenticatedCompaniesIndexRoute
+  '/employees': typeof AuthenticatedEmployeesIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
-  '/': typeof IndexRoute
-  '/companies': typeof CompaniesRouteWithChildren
-  '/employees': typeof EmployeesRouteWithChildren
-  '/requests': typeof RequestsRoute
-  '/tasks': typeof TasksRoute
-  '/companies/$code': typeof CompaniesCodeRoute
-  '/employees/$id': typeof EmployeesIdRoute
-  '/companies/': typeof CompaniesIndexRoute
-  '/employees/': typeof EmployeesIndexRoute
+  '/_authenticated': typeof AuthenticatedRouteRouteWithChildren
+  '/auth': typeof AuthRoute
+  '/_authenticated/companies': typeof AuthenticatedCompaniesRouteWithChildren
+  '/_authenticated/employees': typeof AuthenticatedEmployeesRouteWithChildren
+  '/_authenticated/requests': typeof AuthenticatedRequestsRoute
+  '/_authenticated/tasks': typeof AuthenticatedTasksRoute
+  '/_authenticated/': typeof AuthenticatedIndexRoute
+  '/_authenticated/companies/$code': typeof AuthenticatedCompaniesCodeRoute
+  '/_authenticated/employees/$id': typeof AuthenticatedEmployeesIdRoute
+  '/_authenticated/companies/': typeof AuthenticatedCompaniesIndexRoute
+  '/_authenticated/employees/': typeof AuthenticatedEmployeesIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
+    | '/auth'
     | '/companies'
     | '/employees'
     | '/requests'
@@ -111,136 +131,170 @@ export interface FileRouteTypes {
     | '/employees/'
   fileRoutesByTo: FileRoutesByTo
   to:
-    | '/'
+    | '/auth'
     | '/requests'
     | '/tasks'
+    | '/'
     | '/companies/$code'
     | '/employees/$id'
     | '/companies'
     | '/employees'
   id:
     | '__root__'
-    | '/'
-    | '/companies'
-    | '/employees'
-    | '/requests'
-    | '/tasks'
-    | '/companies/$code'
-    | '/employees/$id'
-    | '/companies/'
-    | '/employees/'
+    | '/_authenticated'
+    | '/auth'
+    | '/_authenticated/companies'
+    | '/_authenticated/employees'
+    | '/_authenticated/requests'
+    | '/_authenticated/tasks'
+    | '/_authenticated/'
+    | '/_authenticated/companies/$code'
+    | '/_authenticated/employees/$id'
+    | '/_authenticated/companies/'
+    | '/_authenticated/employees/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
-  IndexRoute: typeof IndexRoute
-  CompaniesRoute: typeof CompaniesRouteWithChildren
-  EmployeesRoute: typeof EmployeesRouteWithChildren
-  RequestsRoute: typeof RequestsRoute
-  TasksRoute: typeof TasksRoute
+  AuthenticatedRouteRoute: typeof AuthenticatedRouteRouteWithChildren
+  AuthRoute: typeof AuthRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
+    '/auth': {
+      id: '/auth'
+      path: '/auth'
+      fullPath: '/auth'
+      preLoaderRoute: typeof AuthRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/requests': {
-      id: '/requests'
-      path: '/requests'
-      fullPath: '/requests'
-      preLoaderRoute: typeof RequestsRouteImport
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/employees': {
-      id: '/employees'
-      path: '/employees'
-      fullPath: '/employees'
-      preLoaderRoute: typeof EmployeesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/companies': {
-      id: '/companies'
-      path: '/companies'
-      fullPath: '/companies'
-      preLoaderRoute: typeof CompaniesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/': {
-      id: '/'
+    '/_authenticated/': {
+      id: '/_authenticated/'
       path: '/'
       fullPath: '/'
-      preLoaderRoute: typeof IndexRouteImport
-      parentRoute: typeof rootRouteImport
+      preLoaderRoute: typeof AuthenticatedIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/employees/': {
-      id: '/employees/'
+    '/_authenticated/tasks': {
+      id: '/_authenticated/tasks'
+      path: '/tasks'
+      fullPath: '/tasks'
+      preLoaderRoute: typeof AuthenticatedTasksRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/requests': {
+      id: '/_authenticated/requests'
+      path: '/requests'
+      fullPath: '/requests'
+      preLoaderRoute: typeof AuthenticatedRequestsRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/employees': {
+      id: '/_authenticated/employees'
+      path: '/employees'
+      fullPath: '/employees'
+      preLoaderRoute: typeof AuthenticatedEmployeesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/companies': {
+      id: '/_authenticated/companies'
+      path: '/companies'
+      fullPath: '/companies'
+      preLoaderRoute: typeof AuthenticatedCompaniesRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/employees/': {
+      id: '/_authenticated/employees/'
       path: '/'
       fullPath: '/employees/'
-      preLoaderRoute: typeof EmployeesIndexRouteImport
-      parentRoute: typeof EmployeesRoute
+      preLoaderRoute: typeof AuthenticatedEmployeesIndexRouteImport
+      parentRoute: typeof AuthenticatedEmployeesRoute
     }
-    '/companies/': {
-      id: '/companies/'
+    '/_authenticated/companies/': {
+      id: '/_authenticated/companies/'
       path: '/'
       fullPath: '/companies/'
-      preLoaderRoute: typeof CompaniesIndexRouteImport
-      parentRoute: typeof CompaniesRoute
+      preLoaderRoute: typeof AuthenticatedCompaniesIndexRouteImport
+      parentRoute: typeof AuthenticatedCompaniesRoute
     }
-    '/employees/$id': {
-      id: '/employees/$id'
+    '/_authenticated/employees/$id': {
+      id: '/_authenticated/employees/$id'
       path: '/$id'
       fullPath: '/employees/$id'
-      preLoaderRoute: typeof EmployeesIdRouteImport
-      parentRoute: typeof EmployeesRoute
+      preLoaderRoute: typeof AuthenticatedEmployeesIdRouteImport
+      parentRoute: typeof AuthenticatedEmployeesRoute
     }
-    '/companies/$code': {
-      id: '/companies/$code'
+    '/_authenticated/companies/$code': {
+      id: '/_authenticated/companies/$code'
       path: '/$code'
       fullPath: '/companies/$code'
-      preLoaderRoute: typeof CompaniesCodeRouteImport
-      parentRoute: typeof CompaniesRoute
+      preLoaderRoute: typeof AuthenticatedCompaniesCodeRouteImport
+      parentRoute: typeof AuthenticatedCompaniesRoute
     }
   }
 }
 
-interface CompaniesRouteChildren {
-  CompaniesCodeRoute: typeof CompaniesCodeRoute
-  CompaniesIndexRoute: typeof CompaniesIndexRoute
+interface AuthenticatedCompaniesRouteChildren {
+  AuthenticatedCompaniesCodeRoute: typeof AuthenticatedCompaniesCodeRoute
+  AuthenticatedCompaniesIndexRoute: typeof AuthenticatedCompaniesIndexRoute
 }
 
-const CompaniesRouteChildren: CompaniesRouteChildren = {
-  CompaniesCodeRoute: CompaniesCodeRoute,
-  CompaniesIndexRoute: CompaniesIndexRoute,
+const AuthenticatedCompaniesRouteChildren: AuthenticatedCompaniesRouteChildren =
+  {
+    AuthenticatedCompaniesCodeRoute: AuthenticatedCompaniesCodeRoute,
+    AuthenticatedCompaniesIndexRoute: AuthenticatedCompaniesIndexRoute,
+  }
+
+const AuthenticatedCompaniesRouteWithChildren =
+  AuthenticatedCompaniesRoute._addFileChildren(
+    AuthenticatedCompaniesRouteChildren,
+  )
+
+interface AuthenticatedEmployeesRouteChildren {
+  AuthenticatedEmployeesIdRoute: typeof AuthenticatedEmployeesIdRoute
+  AuthenticatedEmployeesIndexRoute: typeof AuthenticatedEmployeesIndexRoute
 }
 
-const CompaniesRouteWithChildren = CompaniesRoute._addFileChildren(
-  CompaniesRouteChildren,
-)
+const AuthenticatedEmployeesRouteChildren: AuthenticatedEmployeesRouteChildren =
+  {
+    AuthenticatedEmployeesIdRoute: AuthenticatedEmployeesIdRoute,
+    AuthenticatedEmployeesIndexRoute: AuthenticatedEmployeesIndexRoute,
+  }
 
-interface EmployeesRouteChildren {
-  EmployeesIdRoute: typeof EmployeesIdRoute
-  EmployeesIndexRoute: typeof EmployeesIndexRoute
+const AuthenticatedEmployeesRouteWithChildren =
+  AuthenticatedEmployeesRoute._addFileChildren(
+    AuthenticatedEmployeesRouteChildren,
+  )
+
+interface AuthenticatedRouteRouteChildren {
+  AuthenticatedCompaniesRoute: typeof AuthenticatedCompaniesRouteWithChildren
+  AuthenticatedEmployeesRoute: typeof AuthenticatedEmployeesRouteWithChildren
+  AuthenticatedRequestsRoute: typeof AuthenticatedRequestsRoute
+  AuthenticatedTasksRoute: typeof AuthenticatedTasksRoute
+  AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
 }
 
-const EmployeesRouteChildren: EmployeesRouteChildren = {
-  EmployeesIdRoute: EmployeesIdRoute,
-  EmployeesIndexRoute: EmployeesIndexRoute,
+const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
+  AuthenticatedCompaniesRoute: AuthenticatedCompaniesRouteWithChildren,
+  AuthenticatedEmployeesRoute: AuthenticatedEmployeesRouteWithChildren,
+  AuthenticatedRequestsRoute: AuthenticatedRequestsRoute,
+  AuthenticatedTasksRoute: AuthenticatedTasksRoute,
+  AuthenticatedIndexRoute: AuthenticatedIndexRoute,
 }
 
-const EmployeesRouteWithChildren = EmployeesRoute._addFileChildren(
-  EmployeesRouteChildren,
-)
+const AuthenticatedRouteRouteWithChildren =
+  AuthenticatedRouteRoute._addFileChildren(AuthenticatedRouteRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
-  IndexRoute: IndexRoute,
-  CompaniesRoute: CompaniesRouteWithChildren,
-  EmployeesRoute: EmployeesRouteWithChildren,
-  RequestsRoute: RequestsRoute,
-  TasksRoute: TasksRoute,
+  AuthenticatedRouteRoute: AuthenticatedRouteRouteWithChildren,
+  AuthRoute: AuthRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
