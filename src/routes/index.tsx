@@ -141,6 +141,22 @@ function Dashboard() {
     .sort((a, b) => a.dueDate.localeCompare(b.dueDate))
     .slice(0, 5);
   const openRequests = requests.filter((r) => r.status !== "Resolved").slice(0, 5);
+  const companyRequests = companies
+    .map((c) => {
+      const open = requests.filter(
+        (r) => r.companyCode === c.code && r.status !== "Resolved",
+      );
+      const latestReq = [...open].sort((a, b) => b.submittedAt.localeCompare(a.submittedAt))[0];
+      return {
+        code: c.code,
+        name: c.name,
+        open: open.length,
+        latest: latestReq ? latestReq.type : "—",
+      };
+    })
+    .filter((c) => c.open > 0)
+    .sort((a, b) => b.open - a.open)
+    .slice(0, 6);
   const openPayroll = payroll.filter((p) => p.status === "Open");
   const startingSoon = employees
     .filter((e) => e.status === "Pending Start")
