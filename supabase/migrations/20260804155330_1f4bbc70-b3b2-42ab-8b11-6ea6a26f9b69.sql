@@ -1,0 +1,1 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE public.companies, public.employees, public.tasks, public.requests, public.payroll_issues, public.employee_notes, public.company_history;
