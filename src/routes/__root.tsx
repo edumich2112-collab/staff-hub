@@ -136,12 +136,17 @@ function RootComponent() {
   const router = useRouter();
 
   useEffect(() => {
+    registerOfflineSupport();
+  }, []);
+
+  useEffect(() => {
     const { data } = supabase.auth.onAuthStateChange((event) => {
       if (event !== "SIGNED_IN" && event !== "SIGNED_OUT" && event !== "USER_UPDATED") return;
       router.invalidate();
     });
     return () => data.subscription.unsubscribe();
   }, [router]);
+
 
   return (
     <QueryClientProvider client={queryClient}>
