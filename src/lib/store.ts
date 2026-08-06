@@ -123,13 +123,13 @@ let loadPromise: Promise<void> | undefined;
 
 async function fetchAll() {
   const [companies, employees, tasks, requests, payroll, history, notes] = await Promise.all([
-    supabase.from("companies").select("*").order("name"),
-    supabase.from("employees").select("*").order("name"),
-    supabase.from("tasks").select("*").order("created_at", { ascending: false }),
-    supabase.from("requests").select("*").order("submitted_at", { ascending: false }),
-    supabase.from("payroll_issues").select("*").order("reported_at", { ascending: false }),
-    supabase.from("company_history").select("*").order("from_date", { ascending: false }),
-    supabase.from("employee_notes").select("*").order("at", { ascending: false }),
+    db.from("companies").select("*").order("name"),
+    db.from("employees").select("*").order("name"),
+    db.from("tasks").select("*").order("created_at", { ascending: false }),
+    db.from("requests").select("*").order("submitted_at", { ascending: false }),
+    db.from("payroll_issues").select("*").order("reported_at", { ascending: false }),
+    db.from("company_history").select("*").order("from_date", { ascending: false }),
+    db.from("employee_notes").select("*").order("at", { ascending: false }),
   ]);
 
   const emps = (employees.data ?? []).map((r) => toEmployee(r as Row));
@@ -220,7 +220,7 @@ function localNote(employeeId: string, text: string, author = "System") {
 async function persistNote(employeeId: string, text: string, author = "System") {
   localNote(employeeId, text, author);
   emit();
-  await supabase.from("employee_notes").insert({ employee_id: employeeId, text, author });
+  await db.from("employee_notes").insert({ employee_id: employeeId, text, author });
 }
 
 export const store = {
@@ -403,7 +403,7 @@ export const store = {
 
   async addCompany(c: Company) {
     if (state.companies.some((x) => x.code === c.code)) return;
-    const { data } = await supabase.from("companies").insert(c).select().single();
+    const { data } = await db.from("companies").insert(c).select().single();
     if (data) set({ companies: [...state.companies, toCompany(data as Row)] });
   },
 
@@ -411,7 +411,7 @@ export const store = {
     set({
       companies: state.companies.map((c) => (c.code === code ? { ...c, ...patch } : c)),
     });
-    await supabase.from("companies").update(patch).eq("code", code);
+    await db.from("companies").update(patch).eq("code", code);
   },
 
   async changeEmployeeCompany(id: string, newCode: string, startDate: string, note?: string) {
@@ -444,7 +444,7 @@ export const store = {
     };
     emit();
 
-    await supabase.from("company_history").insert({
+    await db.from("company_history").insert({
       employee_id: id,
       company_code: historyEntry.companyCode,
       position: historyEntry.position ?? "",
@@ -494,7 +494,7 @@ export const store = {
     emit();
 
     if (historyEntry) {
-      await supabase.from("company_history").insert({
+      await db.from("company_history").insert({
         employee_id: id,
         company_code: historyEntry.companyCode,
         position: historyEntry.position ?? "",
@@ -519,7 +519,7 @@ export const store = {
       ),
     };
     emit();
-    await supabase.from("company_history").insert({
+    await db.from("company_history").insert({
       employee_id: id,
       company_code: entry.companyCode,
       position: entry.position ?? "",
@@ -553,7 +553,7 @@ export const store = {
         p.id === id ? { ...p, status: "Resolved" } : p,
       ),
     });
-    await supabase.from("payroll_issues").update({ status: "Resolved" }).eq("id", id);
+    await db.from("payroll_issues").update({ status: "Resolved" }).eq("id", id);
     if (prev && prev.status !== "Resolved") {
       const amt = prev.amount ? ` ($${prev.amount.toFixed(2)})` : "";
       await persistNote(prev.employeeId, `✓ Payroll issue resolved: ${prev.issue}${amt}`);
@@ -581,17 +581,17 @@ export const store = {
 
   async deleteTask(id: string) {
     set({ tasks: state.tasks.filter((t) => t.id !== id) });
-    await supabase.from("tasks").delete().eq("id", id);
+    await db.from("tasks").delete().eq("id", id);
   },
 
   async deleteRequest(id: string) {
     set({ requests: state.requests.filter((r) => r.id !== id) });
-    await supabase.from("requests").delete().eq("id", id);
+    await db.from("requests").delete().eq("id", id);
   },
 
   async deletePayroll(id: string) {
     set({ payrollIssues: state.payrollIssues.filter((p) => p.id !== id) });
-    await supabase.from("payroll_issues").delete().eq("id", id);
+    await db.from("payroll_issues").delete().eq("id", id);
   },
 };
 
