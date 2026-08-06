@@ -473,7 +473,12 @@ export const store = {
 
   async addCompany(c: Company) {
     if (state.companies.some((x) => x.code === c.code)) return;
-    const { data } = await db.from("companies").insert(c).select().single();
+    const { data } = await db
+      .from("companies")
+      .insert({ ...c } as Record<string, unknown>)
+      .select()
+      .single();
+
     if (data) set({ companies: [...state.companies, toCompany(data as Row)] });
   },
 
