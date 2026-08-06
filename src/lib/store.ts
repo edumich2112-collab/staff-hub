@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { db, flushQueue, isOnline, pendingCount } from "./offline-db";
+
 import type {
   Company,
   Employee,
