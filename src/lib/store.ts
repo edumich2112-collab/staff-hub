@@ -34,15 +34,53 @@ let state: State = {
 
 const listeners = new Set<() => void>();
 
+/* ---------------- offline cache ---------------- */
+
+const CACHE_KEY = "staffhub.cache.v1";
+
+function persistCache() {
+  if (typeof window === "undefined" || !state.loaded) return;
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
+export function hydrateFromCache() {
+  if (typeof window === "undefined" || state.loaded) return;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return;
+    const cached = JSON.parse(raw) as State;
+    state = { ...state, ...cached, loaded: true };
+    listeners.forEach((l) => l());
+  } catch {
+    /* ignore corrupt cache */
+  }
+}
+
+export function clearCache() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(CACHE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 function emit() {
   state = { ...state };
+  persistCache();
   listeners.forEach((l) => l());
 }
 
 function set(patch: Partial<State>) {
   state = { ...state, ...patch };
+  persistCache();
   listeners.forEach((l) => l());
 }
+
 
 /* ---------------- row mappers ---------------- */
 
