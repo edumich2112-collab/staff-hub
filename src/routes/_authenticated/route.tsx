@@ -66,7 +66,9 @@ function AuthenticatedLayout() {
             <div className="flex-1">
               <GlobalSearch />
             </div>
+            <SyncStatus />
             <ThemeToggle />
+
             <Button
               variant="ghost"
               size="icon"
