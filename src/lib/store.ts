@@ -165,15 +165,26 @@ async function fetchAll() {
 
 export function loadStore(force = false) {
   if (force) loadPromise = undefined;
-  if (!loadPromise) loadPromise = fetchAll().catch((e) => {
-    console.error("Failed to load data", e);
-    loadPromise = undefined;
-  });
+  if (!loadPromise) {
+    // Show cached data instantly (and keep working with it while offline).
+    hydrateFromCache();
+    if (!isOnline()) {
+      set({ loaded: true });
+      loadPromise = Promise.resolve();
+      return loadPromise;
+    }
+    loadPromise = fetchAll().catch((e) => {
+      console.error("Failed to load data", e);
+      loadPromise = undefined;
+      set({ loaded: true });
+    });
+  }
   return loadPromise;
 }
 
 export function resetStore() {
   loadPromise = undefined;
+  clearCache();
   set({
     companies: [],
     employees: [],
@@ -183,6 +194,25 @@ export function resetStore() {
     loaded: false,
   });
 }
+
+/* ---------------- sync ---------------- */
+
+export async function syncNow() {
+  if (!isOnline()) return { synced: 0, failed: pendingCount() };
+  const result = await flushQueue();
+  await loadStore(true);
+  return result;
+}
+
+export function watchConnection() {
+  if (typeof window === "undefined") return () => {};
+  const onOnline = () => {
+    void syncNow();
+  };
+  window.addEventListener("online", onOnline);
+  return () => window.removeEventListener("online", onOnline);
+}
+
 
 let channel: ReturnType<typeof supabase.channel> | undefined;
 
