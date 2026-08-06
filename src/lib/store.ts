@@ -1,5 +1,7 @@
 import { useSyncExternalStore } from "react";
 import { supabase } from "@/integrations/supabase/client";
+import { db, flushQueue, isOnline, pendingCount } from "./offline-db";
+
 import type {
   Company,
   Employee,
@@ -32,15 +34,53 @@ let state: State = {
 
 const listeners = new Set<() => void>();
 
+/* ---------------- offline cache ---------------- */
+
+const CACHE_KEY = "staffhub.cache.v1";
+
+function persistCache() {
+  if (typeof window === "undefined" || !state.loaded) return;
+  try {
+    localStorage.setItem(CACHE_KEY, JSON.stringify(state));
+  } catch {
+    /* ignore quota errors */
+  }
+}
+
+export function hydrateFromCache() {
+  if (typeof window === "undefined" || state.loaded) return;
+  try {
+    const raw = localStorage.getItem(CACHE_KEY);
+    if (!raw) return;
+    const cached = JSON.parse(raw) as State;
+    state = { ...state, ...cached, loaded: true };
+    listeners.forEach((l) => l());
+  } catch {
+    /* ignore corrupt cache */
+  }
+}
+
+export function clearCache() {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.removeItem(CACHE_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
 function emit() {
   state = { ...state };
+  persistCache();
   listeners.forEach((l) => l());
 }
 
 function set(patch: Partial<State>) {
   state = { ...state, ...patch };
+  persistCache();
   listeners.forEach((l) => l());
 }
+
 
 /* ---------------- row mappers ---------------- */
 
@@ -123,13 +163,13 @@ let loadPromise: Promise<void> | undefined;
 
 async function fetchAll() {
   const [companies, employees, tasks, requests, payroll, history, notes] = await Promise.all([
-    supabase.from("companies").select("*").order("name"),
-    supabase.from("employees").select("*").order("name"),
-    supabase.from("tasks").select("*").order("created_at", { ascending: false }),
-    supabase.from("requests").select("*").order("submitted_at", { ascending: false }),
-    supabase.from("payroll_issues").select("*").order("reported_at", { ascending: false }),
-    supabase.from("company_history").select("*").order("from_date", { ascending: false }),
-    supabase.from("employee_notes").select("*").order("at", { ascending: false }),
+    db.from("companies").select("*").order("name"),
+    db.from("employees").select("*").order("name"),
+    db.from("tasks").select("*").order("created_at", { ascending: false }),
+    db.from("requests").select("*").order("submitted_at", { ascending: false }),
+    db.from("payroll_issues").select("*").order("reported_at", { ascending: false }),
+    db.from("company_history").select("*").order("from_date", { ascending: false }),
+    db.from("employee_notes").select("*").order("at", { ascending: false }),
   ]);
 
   const emps = (employees.data ?? []).map((r) => toEmployee(r as Row));
@@ -165,15 +205,26 @@ async function fetchAll() {
 
 export function loadStore(force = false) {
   if (force) loadPromise = undefined;
-  if (!loadPromise) loadPromise = fetchAll().catch((e) => {
-    console.error("Failed to load data", e);
-    loadPromise = undefined;
-  });
+  if (!loadPromise) {
+    // Show cached data instantly (and keep working with it while offline).
+    hydrateFromCache();
+    if (!isOnline()) {
+      set({ loaded: true });
+      loadPromise = Promise.resolve();
+      return loadPromise;
+    }
+    loadPromise = fetchAll().catch((e) => {
+      console.error("Failed to load data", e);
+      loadPromise = undefined;
+      set({ loaded: true });
+    });
+  }
   return loadPromise;
 }
 
 export function resetStore() {
   loadPromise = undefined;
+  clearCache();
   set({
     companies: [],
     employees: [],
@@ -183,6 +234,25 @@ export function resetStore() {
     loaded: false,
   });
 }
+
+/* ---------------- sync ---------------- */
+
+export async function syncNow() {
+  if (!isOnline()) return { synced: 0, failed: pendingCount() };
+  const result = await flushQueue();
+  await loadStore(true);
+  return result;
+}
+
+export function watchConnection() {
+  if (typeof window === "undefined") return () => {};
+  const onOnline = () => {
+    void syncNow();
+  };
+  window.addEventListener("online", onOnline);
+  return () => window.removeEventListener("online", onOnline);
+}
+
 
 let channel: ReturnType<typeof supabase.channel> | undefined;
 
@@ -220,7 +290,7 @@ function localNote(employeeId: string, text: string, author = "System") {
 async function persistNote(employeeId: string, text: string, author = "System") {
   localNote(employeeId, text, author);
   emit();
-  await supabase.from("employee_notes").insert({ employee_id: employeeId, text, author });
+  await db.from("employee_notes").insert({ employee_id: employeeId, text, author });
 }
 
 export const store = {
@@ -403,7 +473,12 @@ export const store = {
 
   async addCompany(c: Company) {
     if (state.companies.some((x) => x.code === c.code)) return;
-    const { data } = await supabase.from("companies").insert(c).select().single();
+    const { data } = await db
+      .from("companies")
+      .insert({ ...c } as Record<string, unknown>)
+      .select()
+      .single();
+
     if (data) set({ companies: [...state.companies, toCompany(data as Row)] });
   },
 
@@ -411,7 +486,7 @@ export const store = {
     set({
       companies: state.companies.map((c) => (c.code === code ? { ...c, ...patch } : c)),
     });
-    await supabase.from("companies").update(patch).eq("code", code);
+    await db.from("companies").update(patch).eq("code", code);
   },
 
   async changeEmployeeCompany(id: string, newCode: string, startDate: string, note?: string) {
@@ -444,7 +519,7 @@ export const store = {
     };
     emit();
 
-    await supabase.from("company_history").insert({
+    await db.from("company_history").insert({
       employee_id: id,
       company_code: historyEntry.companyCode,
       position: historyEntry.position ?? "",
@@ -494,7 +569,7 @@ export const store = {
     emit();
 
     if (historyEntry) {
-      await supabase.from("company_history").insert({
+      await db.from("company_history").insert({
         employee_id: id,
         company_code: historyEntry.companyCode,
         position: historyEntry.position ?? "",
@@ -519,7 +594,7 @@ export const store = {
       ),
     };
     emit();
-    await supabase.from("company_history").insert({
+    await db.from("company_history").insert({
       employee_id: id,
       company_code: entry.companyCode,
       position: entry.position ?? "",
@@ -553,7 +628,7 @@ export const store = {
         p.id === id ? { ...p, status: "Resolved" } : p,
       ),
     });
-    await supabase.from("payroll_issues").update({ status: "Resolved" }).eq("id", id);
+    await db.from("payroll_issues").update({ status: "Resolved" }).eq("id", id);
     if (prev && prev.status !== "Resolved") {
       const amt = prev.amount ? ` ($${prev.amount.toFixed(2)})` : "";
       await persistNote(prev.employeeId, `✓ Payroll issue resolved: ${prev.issue}${amt}`);
@@ -581,17 +656,17 @@ export const store = {
 
   async deleteTask(id: string) {
     set({ tasks: state.tasks.filter((t) => t.id !== id) });
-    await supabase.from("tasks").delete().eq("id", id);
+    await db.from("tasks").delete().eq("id", id);
   },
 
   async deleteRequest(id: string) {
     set({ requests: state.requests.filter((r) => r.id !== id) });
-    await supabase.from("requests").delete().eq("id", id);
+    await db.from("requests").delete().eq("id", id);
   },
 
   async deletePayroll(id: string) {
     set({ payrollIssues: state.payrollIssues.filter((p) => p.id !== id) });
-    await supabase.from("payroll_issues").delete().eq("id", id);
+    await db.from("payroll_issues").delete().eq("id", id);
   },
 };
 
