@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-
 import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { isLocalMode, setLocalMode } from "@/lib/local-mode";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { GlobalSearch } from "@/components/global-search";
