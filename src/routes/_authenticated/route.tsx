@@ -20,6 +20,8 @@ import {
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
+    // Local-only mode: no account, everything stays on this computer.
+    if (isLocalMode()) return { user: null };
     // Offline: trust the locally cached session instead of hitting the network.
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       const { data } = await supabase.auth.getSession();
