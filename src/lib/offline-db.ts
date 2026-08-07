@@ -9,6 +9,7 @@
  *     order, as soon as the device is back online and signed in.
  */
 import { supabase } from "@/integrations/supabase/client";
+import { isLocalMode } from "./local-mode";
 
 export type QueuedOp = {
   id: string;
