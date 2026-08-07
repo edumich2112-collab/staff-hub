@@ -224,7 +224,7 @@ function CompanyPage() {
                     </div>
                     <div className="mt-1 flex items-center justify-between gap-2 text-xs text-muted-foreground">
                       <span className="truncate">
-                        {empName(r.employeeId)} · {formatDate(r.submittedAt)}
+                        {r.employeeId ? empName(r.employeeId) : "Company request"} · {formatDate(r.submittedAt)}
                       </span>
                       <span className="inline-flex items-center gap-1 font-medium">
                         <Pencil className="h-3 w-3" /> Edit
