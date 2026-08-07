@@ -31,12 +31,25 @@ function usePending() {
   );
 }
 
+function useLocalOnly() {
+  return useSyncExternalStore(
+    subscribeLocalMode,
+    () => isLocalMode(),
+    () => false,
+  );
+}
+
 export function SyncStatus() {
   const online = useOnline();
+  const localOnly = useLocalOnly();
   const pending = usePending();
   const [syncing, setSyncing] = useState(false);
 
   async function handleSync() {
+    if (localOnly) {
+      toast.info("You're working offline without an account — sign in to share these changes.");
+      return;
+    }
     if (!online) {
       toast.error("You're offline — changes will sync when you reconnect.");
       return;
@@ -48,6 +61,7 @@ export function SyncStatus() {
     else if (synced > 0) toast.success(`Shared ${synced} offline change${synced === 1 ? "" : "s"}.`);
     else toast.success("Everything is up to date.");
   }
+
 
   return (
     <div className="flex items-center gap-1.5">
