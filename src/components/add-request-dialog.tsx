@@ -49,14 +49,20 @@ export function AddRequestDialog({
 }: Props) {
   const [open, setOpen] = useState(false);
   const employees = useStore((s) => s.employees);
+  const companies = useStore((s) => s.companies);
+  const [target, setTarget] = useState<"employee" | "company">(
+    fixedEmp ? "employee" : fixedCompany ? "company" : "employee",
+  );
   const [employeeId, setEmployeeId] = useState(fixedEmp ?? "");
+  const [company, setCompany] = useState(fixedCompany ?? "");
   const [type, setType] = useState<RequestType>("General HR");
   const [priority, setPriority] = useState<Priority>("Medium");
   const [notes, setNotes] = useState("");
   const [assignedTo, setAssignedTo] = useState("");
 
   const emp = useMemo(() => employees.find((e) => e.id === employeeId), [employees, employeeId]);
-  const companyCode = fixedCompany ?? emp?.companyCode ?? "";
+  const companyCode =
+    target === "company" ? company : (fixedCompany ?? emp?.companyCode ?? "");
 
   const employeeChoices = useMemo(
     () =>
@@ -66,10 +72,12 @@ export function AddRequestDialog({
     [employees, fixedCompany],
   );
 
+  const valid = notes.trim() && companyCode && (target === "company" || employeeId);
+
   const submit = () => {
-    if (!notes.trim() || !employeeId || !companyCode) return;
+    if (!valid) return;
     store.addRequest({
-      employeeId,
+      employeeId: target === "company" ? "" : employeeId,
       companyCode,
       type,
       priority,
@@ -95,11 +103,23 @@ export function AddRequestDialog({
         <DialogHeader>
           <DialogTitle>Attach a new request</DialogTitle>
           <DialogDescription>
-            Log a request from this employee. When marked Resolved, it's time-stamped and a permanent note is added to the employee.
+            Log a request from an employee or a client company. When marked Resolved, it's time-stamped.
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-3">
           {!fixedEmp && (
+            <div className="grid gap-1.5">
+              <Label>Request from</Label>
+              <Select value={target} onValueChange={(v) => setTarget(v as "employee" | "company")}>
+                <SelectTrigger><SelectValue /></SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="employee">An employee</SelectItem>
+                  <SelectItem value="company">A company (client)</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+          {!fixedEmp && target === "employee" && (
             <div className="grid gap-1.5">
               <Label>Employee</Label>
               <Select value={employeeId} onValueChange={setEmployeeId}>
@@ -114,6 +134,22 @@ export function AddRequestDialog({
               </Select>
             </div>
           )}
+          {target === "company" && !fixedCompany && (
+            <div className="grid gap-1.5">
+              <Label>Company</Label>
+              <Select value={company} onValueChange={setCompany}>
+                <SelectTrigger><SelectValue placeholder="Select company" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {companies.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>
+                      {c.name} — {c.code}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="grid gap-1.5">
             <Label>Request type</Label>
             <Select value={type} onValueChange={(v) => setType(v as RequestType)}>
