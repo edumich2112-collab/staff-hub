@@ -40,8 +40,13 @@ interface Props {
 export function EditRequestDialog({ request, children }: Props) {
   const [open, setOpen] = useState(false);
   const employees = useStore((s) => s.employees);
+  const companies = useStore((s) => s.companies);
 
+  const [target, setTarget] = useState<"employee" | "company">(
+    request.employeeId ? "employee" : "company",
+  );
   const [employeeId, setEmployeeId] = useState(request.employeeId);
+  const [company, setCompany] = useState(request.companyCode);
   const [type, setType] = useState<RequestType>(request.type);
   const [priority, setPriority] = useState<Priority>(request.priority);
   const [status, setStatus] = useState<RequestStatus>(request.status);
@@ -50,7 +55,9 @@ export function EditRequestDialog({ request, children }: Props) {
 
   useEffect(() => {
     if (open) {
+      setTarget(request.employeeId ? "employee" : "company");
       setEmployeeId(request.employeeId);
+      setCompany(request.companyCode);
       setType(request.type);
       setPriority(request.priority);
       setStatus(request.status);
@@ -62,8 +69,9 @@ export function EditRequestDialog({ request, children }: Props) {
   function save() {
     const emp = employees.find((e) => e.id === employeeId);
     store.updateRequest(request.id, {
-      employeeId,
-      companyCode: emp?.companyCode ?? request.companyCode,
+      employeeId: target === "company" ? "" : employeeId,
+      companyCode:
+        target === "company" ? company : (emp?.companyCode ?? request.companyCode),
       type,
       priority,
       status,
@@ -89,16 +97,41 @@ export function EditRequestDialog({ request, children }: Props) {
         </DialogHeader>
         <div className="grid gap-3">
           <div className="grid gap-1.5">
-            <Label>Employee</Label>
-            <Select value={employeeId} onValueChange={setEmployeeId}>
+            <Label>Request from</Label>
+            <Select value={target} onValueChange={(v) => setTarget(v as "employee" | "company")}>
               <SelectTrigger><SelectValue /></SelectTrigger>
-              <SelectContent className="max-h-72">
-                {employees.map((e) => (
-                  <SelectItem key={e.id} value={e.id}>{e.name} — {e.companyCode}</SelectItem>
-                ))}
+              <SelectContent>
+                <SelectItem value="employee">An employee</SelectItem>
+                <SelectItem value="company">A company (client)</SelectItem>
               </SelectContent>
             </Select>
           </div>
+          {target === "employee" ? (
+            <div className="grid gap-1.5">
+              <Label>Employee</Label>
+              <Select value={employeeId} onValueChange={setEmployeeId}>
+                <SelectTrigger><SelectValue placeholder="Select employee" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {employees.map((e) => (
+                    <SelectItem key={e.id} value={e.id}>{e.name} — {e.companyCode}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          ) : (
+            <div className="grid gap-1.5">
+              <Label>Company</Label>
+              <Select value={company} onValueChange={setCompany}>
+                <SelectTrigger><SelectValue placeholder="Select company" /></SelectTrigger>
+                <SelectContent className="max-h-72">
+                  {companies.map((c) => (
+                    <SelectItem key={c.code} value={c.code}>{c.name} — {c.code}</SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-3">
             <div className="grid gap-1.5">
               <Label>Type</Label>
