@@ -41,18 +41,27 @@ function AuthenticatedLayout() {
   const loaded = useStore((s) => s.loaded);
   const [signingOut, setSigningOut] = useState(false);
 
+  const localOnly = isLocalMode();
+
   useEffect(() => {
     void loadStore().then(() => syncNow());
+    if (localOnly) return;
     const stopWatching = watchConnection();
     const stopRealtime = subscribeRealtime();
     return () => {
       stopWatching();
       stopRealtime();
     };
-  }, []);
+  }, [localOnly]);
 
   async function handleSignOut() {
     setSigningOut(true);
+    if (localOnly) {
+      // Keep the local data and queued changes so they can be shared after login.
+      setLocalMode(false);
+      navigate({ to: "/auth", replace: true });
+      return;
+    }
     resetStore();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });
