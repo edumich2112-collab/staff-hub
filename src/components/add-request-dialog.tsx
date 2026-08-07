@@ -194,7 +194,7 @@ export function AddRequestDialog({
         </div>
         <DialogFooter>
           <Button variant="ghost" onClick={() => setOpen(false)}>Cancel</Button>
-          <Button onClick={submit} disabled={!notes.trim() || !employeeId}>Attach request</Button>
+          <Button onClick={submit} disabled={!valid}>Attach request</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
