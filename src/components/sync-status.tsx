@@ -1,8 +1,9 @@
 import { useEffect, useState, useSyncExternalStore } from "react";
-import { Cloud, CloudOff, RefreshCw } from "lucide-react";
+import { Cloud, CloudOff, HardDrive, RefreshCw } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { pendingCount, subscribeQueue } from "@/lib/offline-db";
+import { isLocalMode, subscribeLocalMode } from "@/lib/local-mode";
 import { syncNow } from "@/lib/store";
 import { cn } from "@/lib/utils";
 
