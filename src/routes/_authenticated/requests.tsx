@@ -121,13 +121,17 @@ function RequestsPage() {
             {filtered.map((r) => (
               <TableRow key={r.id}>
                 <TableCell>
-                  <Link
-                    to="/employees/$id"
-                    params={{ id: r.employeeId }}
-                    className="font-medium hover:text-primary hover:underline"
-                  >
-                    {empName(r.employeeId)}
-                  </Link>
+                  {r.employeeId ? (
+                    <Link
+                      to="/employees/$id"
+                      params={{ id: r.employeeId }}
+                      className="font-medium hover:text-primary hover:underline"
+                    >
+                      {empName(r.employeeId)}
+                    </Link>
+                  ) : (
+                    <span className="font-medium text-muted-foreground">Company request</span>
+                  )}
                   {r.notes && <div className="text-xs text-muted-foreground">{r.notes}</div>}
                 </TableCell>
                 <TableCell>
