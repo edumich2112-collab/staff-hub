@@ -1,8 +1,9 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
-import { Building2 } from "lucide-react";
+import { Building2, HardDriveDownload } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { setLocalMode } from "@/lib/local-mode";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -166,6 +167,32 @@ function AuthPage() {
               </form>
             </TabsContent>
           </Tabs>
+
+          <div className="relative py-5">
+            <div className="absolute inset-0 flex items-center">
+              <span className="w-full border-t" />
+            </div>
+            <span className="relative mx-auto block w-fit bg-card px-2 text-xs uppercase tracking-wide text-muted-foreground">
+              or
+            </span>
+          </div>
+
+          <Button
+            type="button"
+            variant="outline"
+            className="w-full gap-2"
+            onClick={() => {
+              setLocalMode(true);
+              navigate({ to: "/", replace: true });
+            }}
+          >
+            <HardDriveDownload className="h-4 w-4" />
+            Use offline without an account
+          </Button>
+          <p className="pt-2 text-center text-xs text-muted-foreground">
+            Works with no internet. Everything stays on this computer, and your changes can be
+            shared with the team later once you sign in.
+          </p>
         </CardContent>
       </Card>
     </div>

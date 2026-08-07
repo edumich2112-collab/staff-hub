@@ -2,6 +2,7 @@ import { createFileRoute, Outlet, redirect, useNavigate } from "@tanstack/react-
 import { useEffect, useState } from "react";
 import { LogOut } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { isLocalMode, setLocalMode } from "@/lib/local-mode";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/app-sidebar";
 import { GlobalSearch } from "@/components/global-search";
@@ -20,6 +21,8 @@ import {
 export const Route = createFileRoute("/_authenticated")({
   ssr: false,
   beforeLoad: async () => {
+    // Local-only mode: no account, everything stays on this computer.
+    if (isLocalMode()) return { user: null };
     // Offline: trust the locally cached session instead of hitting the network.
     if (typeof navigator !== "undefined" && !navigator.onLine) {
       const { data } = await supabase.auth.getSession();
@@ -38,18 +41,27 @@ function AuthenticatedLayout() {
   const loaded = useStore((s) => s.loaded);
   const [signingOut, setSigningOut] = useState(false);
 
+  const localOnly = isLocalMode();
+
   useEffect(() => {
     void loadStore().then(() => syncNow());
+    if (localOnly) return;
     const stopWatching = watchConnection();
     const stopRealtime = subscribeRealtime();
     return () => {
       stopWatching();
       stopRealtime();
     };
-  }, []);
+  }, [localOnly]);
 
   async function handleSignOut() {
     setSigningOut(true);
+    if (localOnly) {
+      // Keep the local data and queued changes so they can be shared after login.
+      setLocalMode(false);
+      navigate({ to: "/auth", replace: true });
+      return;
+    }
     resetStore();
     await supabase.auth.signOut();
     navigate({ to: "/auth", replace: true });

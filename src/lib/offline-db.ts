@@ -9,6 +9,7 @@
  *     order, as soon as the device is back online and signed in.
  */
 import { supabase } from "@/integrations/supabase/client";
+import { isLocalMode } from "./local-mode";
 
 export type QueuedOp = {
   id: string;
@@ -23,7 +24,9 @@ const QUEUE_KEY = "staffhub.pending-ops.v1";
 
 const isBrowser = () => typeof window !== "undefined";
 
-export const isOnline = () => (isBrowser() ? navigator.onLine : true);
+// Local-only mode behaves exactly like being offline: nothing is read from or
+// written to the shared database until the user signs in.
+export const isOnline = () => (isBrowser() ? navigator.onLine && !isLocalMode() : true);
 
 function uuid() {
   if (isBrowser() && typeof crypto !== "undefined" && crypto.randomUUID) return crypto.randomUUID();
