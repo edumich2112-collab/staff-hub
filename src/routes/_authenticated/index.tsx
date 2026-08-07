@@ -277,7 +277,7 @@ function Dashboard() {
                 <div className="flex-1 min-w-0">
                   <div className="truncate text-sm font-medium">{r.type}</div>
                   <div className="mt-0.5 flex items-center gap-2 text-xs text-muted-foreground">
-                    <span className="truncate">{empName(r.employeeId)}</span>
+                    <span className="truncate">{r.employeeId ? empName(r.employeeId) : "Company request"}</span>
                     <span>·</span>
                     <span>{r.companyCode}</span>
                     <span>·</span>

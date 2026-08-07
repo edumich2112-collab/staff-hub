@@ -380,11 +380,12 @@ export const store = {
         ...(patch.assignedTo !== undefined ? { assigned_to: patch.assignedTo } : {}),
         ...(patch.notes !== undefined ? { notes: patch.notes } : {}),
         ...(patch.companyCode !== undefined ? { company_code: nullable(patch.companyCode) } : {}),
+        ...(patch.employeeId !== undefined ? { employee_id: nullable(patch.employeeId) } : {}),
         completed_at: completedAt ?? null,
       })
       .eq("id", id);
 
-    if (prev && patch.status === "Resolved" && prev.status !== "Resolved") {
+    if (prev?.employeeId && patch.status === "Resolved" && prev.status !== "Resolved") {
       await persistNote(
         prev.employeeId,
         `✓ Request resolved: ${prev.type}${prev.notes ? ` — ${prev.notes}` : ""}`,
